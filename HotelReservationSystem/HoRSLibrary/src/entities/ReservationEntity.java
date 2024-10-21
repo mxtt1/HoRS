@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
@@ -36,6 +37,10 @@ public class ReservationEntity implements Serializable {
     
     @ManyToOne()
     private GuestEntity guest;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private RoomTypeEntity roomType;
 
     public Long getId() {
         return id;
@@ -108,6 +113,14 @@ public class ReservationEntity implements Serializable {
 
     public void setGuest(GuestEntity guest) {
         this.guest = guest;
+    }
+
+    public RoomTypeEntity getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomTypeEntity roomType) {
+        this.roomType = roomType;
     }
     
 }
