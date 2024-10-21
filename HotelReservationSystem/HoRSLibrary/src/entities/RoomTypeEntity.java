@@ -43,10 +43,10 @@ public class RoomTypeEntity implements Serializable {
     @OneToMany(mappedBy = "roomType", orphanRemoval = true)
     private List<RoomRateEntity> allRates;
     
-    @OneToOne   
+    @OneToOne(orphanRemoval = true)   
     private RoomRateEntity normalRate;
     
-    @OneToOne
+    @OneToOne(orphanRemoval = true)
     private RoomRateEntity publishedRate;
     
     @OneToMany (mappedBy = "roomType")
