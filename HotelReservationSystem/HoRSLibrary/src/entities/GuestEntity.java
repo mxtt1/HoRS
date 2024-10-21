@@ -57,5 +57,13 @@ public class GuestEntity implements Serializable {
     public String toString() {
         return "entities.GuestEntity[ id=" + id + " ]";
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     
 }

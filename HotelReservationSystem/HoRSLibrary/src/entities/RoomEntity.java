@@ -5,45 +5,47 @@
 package entities;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import util.enums.RoomStatus;
 
 /**
  *
  * @author mattl
  */
 @Entity
-public class ReservationEntity implements Serializable {
+public class RoomEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 100)
-    private String guestName;
+    @Column(length = 4, nullable = false, unique = true)
+    private String roomNumber;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LocalDate startDate;
-    @Column(nullable = false)
-    private LocalDate endDate;
-    
-    @ManyToOne()
-    private EmployeeEntity employee;
-    
-    @ManyToOne()
-    private GuestEntity guest;
+    private RoomStatus roomStatus;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @ManyToOne()
-    private RoomEntity assignedRoom;
+    @OneToMany(mappedBy = "assignedRoom", orphanRemoval = true)
+    private List<ReservationEntity> reservations;
+    
+    @OneToOne()
+    private ReservationEntity currentReservation;
 
     public Long getId() {
         return id;
@@ -63,10 +65,10 @@ public class ReservationEntity implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ReservationEntity)) {
+        if (!(object instanceof RoomEntity)) {
             return false;
         }
-        ReservationEntity other = (ReservationEntity) object;
+        RoomEntity other = (RoomEntity) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -75,47 +77,23 @@ public class ReservationEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.ReservationEntity[ id=" + id + " ]";
+        return "entities.RoomEntity[ id=" + id + " ]";
     }
 
-    public String getGuestName() {
-        return guestName;
+    public String getRoomNumber() {
+        return roomNumber;
     }
 
-    public void setGuestName(String guestName) {
-        this.guestName = guestName;
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public RoomStatus getRoomStatus() {
+        return roomStatus;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public EmployeeEntity getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(EmployeeEntity employee) {
-        this.employee = employee;
-    }
-
-    public GuestEntity getGuest() {
-        return guest;
-    }
-
-    public void setGuest(GuestEntity guest) {
-        this.guest = guest;
+    public void setRoomStatus(RoomStatus roomStatus) {
+        this.roomStatus = roomStatus;
     }
 
     public RoomTypeEntity getRoomType() {
@@ -126,12 +104,20 @@ public class ReservationEntity implements Serializable {
         this.roomType = roomType;
     }
 
-    public RoomEntity getAssignedRoom() {
-        return assignedRoom;
+    public List<ReservationEntity> getReservations() {
+        return reservations;
     }
 
-    public void setAssignedRoom(RoomEntity assignedRoom) {
-        this.assignedRoom = assignedRoom;
+    public void setReservations(List<ReservationEntity> reservations) {
+        this.reservations = reservations;
+    }
+
+    public ReservationEntity getCurrentReservation() {
+        return currentReservation;
+    }
+
+    public void setCurrentReservation(ReservationEntity currentReservation) {
+        this.currentReservation = currentReservation;
     }
     
 }

@@ -41,13 +41,16 @@ public class RoomTypeEntity implements Serializable {
     private int ranking;
     
     @OneToMany(mappedBy = "roomType", orphanRemoval = true)
-    private List<RoomRateEntity> peakPromotionRates;
+    private List<RoomRateEntity> allRates;
     
     @OneToOne   
     private RoomRateEntity normalRate;
     
     @OneToOne
     private RoomRateEntity publishedRate;
+    
+    @OneToMany (mappedBy = "roomType")
+    private List<RoomEntity> rooms;
     
     public Long getId() {
         return id;
@@ -122,12 +125,12 @@ public class RoomTypeEntity implements Serializable {
         this.amenities = amenities;
     }
 
-    public List<RoomRateEntity> getPeakPromotionRates() {
-        return peakPromotionRates;
+    public List<RoomRateEntity> getAllRates() {
+        return allRates;
     }
 
-    public void setPeakPromotionRates(List<RoomRateEntity> peakPromotionRates) {
-        this.peakPromotionRates = peakPromotionRates;
+    public void setAllRates(List<RoomRateEntity> allRates) {
+        this.allRates = allRates;
     }
 
     public RoomRateEntity getNormalRate() {
@@ -160,6 +163,14 @@ public class RoomTypeEntity implements Serializable {
 
     public void setRanking(int ranking) {
         this.ranking = ranking;
+    }
+
+    public List<RoomEntity> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(List<RoomEntity> rooms) {
+        this.rooms = rooms;
     }
     
 }
