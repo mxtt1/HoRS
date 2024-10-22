@@ -18,5 +18,7 @@ public interface RoomTypeEntitySessionBeanLocal {
     long createNewRoomType(RoomTypeEntity newRoomType);
 
     List<RoomTypeEntity> retrieveAllRoomTypes();
+
+    RoomTypeEntity retrieveRoomType(long roomTypeId);
     
 }

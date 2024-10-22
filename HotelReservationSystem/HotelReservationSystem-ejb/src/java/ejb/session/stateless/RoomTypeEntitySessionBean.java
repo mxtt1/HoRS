@@ -49,5 +49,21 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         }
     }
     
+    @Override
+    public RoomTypeEntity retrieveRoomType(long roomTypeId) {
+        return em.find(RoomTypeEntity.class, roomTypeId);
+    }
+    
+    @Override
+    public RoomTypeEntity retrieveRoomType(long roomTypeId, boolean loadRooms, boolean loadAllRates) {
+        RoomTypeEntity retrievedRoomType = this.retrieveRoomType(roomTypeId);
+        if (loadRooms) retrievedRoomType.getRooms().size();
+        if(loadAllRates) retrievedRoomType.getAllRates().size();
+        return retrievedRoomType;
+    }
+
+
+    
+    
     
 }
