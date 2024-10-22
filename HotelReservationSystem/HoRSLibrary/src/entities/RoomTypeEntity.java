@@ -39,6 +39,8 @@ public class RoomTypeEntity implements Serializable {
     private String amenities;
     @Column(nullable = false)
     private int ranking;
+    @Column(nullable = false)
+    private boolean disabled;
     
     @OneToMany(mappedBy = "roomType", orphanRemoval = true)
     private List<RoomRateEntity> allRates;
@@ -51,6 +53,11 @@ public class RoomTypeEntity implements Serializable {
     
     @OneToMany (mappedBy = "roomType")
     private List<RoomEntity> rooms;
+
+    public RoomTypeEntity() {
+        this.disabled = false;
+    }
+    
     
     public Long getId() {
         return id;

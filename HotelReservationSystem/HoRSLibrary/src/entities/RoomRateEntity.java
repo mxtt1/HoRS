@@ -36,7 +36,8 @@ public class RoomRateEntity implements Serializable {
     private RateType rateType;
     @Column(nullable = false, precision = 16, scale = 2)
     private BigDecimal ratePerNight;
-
+    @Column(nullable = false)
+    private boolean disabled;
     
     private LocalDate startDate;
     private LocalDate endDate;
@@ -44,6 +45,11 @@ public class RoomRateEntity implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
+
+    public RoomRateEntity() {
+        this.disabled = false;
+    }
+    
     
     
     public Long getId() {

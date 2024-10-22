@@ -18,5 +18,7 @@ public interface EmployeeEntitySessionBeanRemote {
     long createNewEmployee(EmployeeEntity newEmployee);
 
     List<EmployeeEntity> retrieveAllEmployees();
+
+    EmployeeEntity retrieveEmployeeByUsername(String username);
     
 }
