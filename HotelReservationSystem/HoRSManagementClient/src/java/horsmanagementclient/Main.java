@@ -4,17 +4,28 @@
  */
 package horsmanagementclient;
 
+import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
+import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
+import javax.ejb.EJB;
+import util.exception.InvalidAccessRightException;
+import util.exception.InvalidLoginCredentialException;
+
 /**
  *
  * @author mattl
  */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    @EJB(name = "EmployeeEntitySessionBeanRemote")
+    private static EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
+
+    @EJB(name = "RoomTypeEntitySessionBeanRemote")
+    private static RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+    
+    
+    public static void main(String[] args) throws InvalidLoginCredentialException, InvalidAccessRightException {
+        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote);
+        mainApp.runApp();
     }
     
 }
