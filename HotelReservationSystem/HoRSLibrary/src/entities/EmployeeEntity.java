@@ -5,6 +5,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,7 +39,17 @@ public class EmployeeEntity implements Serializable {
     private String fullName;
     
     @OneToMany(mappedBy = "employee")
-    private List<ReservationEntity> reservations;
+    private List<ReservationEntity> reservations = new ArrayList<ReservationEntity>();
+
+    public EmployeeEntity() {
+    }
+
+    public EmployeeEntity(EmployeeRole employeeRole, String username, String password, String fullName) {
+        this.employeeRole = employeeRole;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+    }
 
 
     public Long getId() {
