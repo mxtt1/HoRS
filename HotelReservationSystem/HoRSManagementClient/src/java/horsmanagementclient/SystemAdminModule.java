@@ -7,8 +7,11 @@ package horsmanagementclient;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -129,7 +132,11 @@ public class SystemAdminModule {
                     " Username: " + e.getUsername() + " Password: " + e.getPassword());
         }
         System.out.print("\nPress any key to continue.");
-        System.in.read();
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
