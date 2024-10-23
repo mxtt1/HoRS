@@ -24,6 +24,8 @@ public class MainApp {
     
     private EmployeeEntity currentEmployeeEntity;
     
+    Scanner sc = new Scanner(System.in);
+    
     
     public MainApp() {
         
@@ -43,34 +45,34 @@ public class MainApp {
             System.out.println("1: Login");
             System.out.println("2: Exit");
             response = 0;
-            while (response < 1 || response > 2) {
-                System.out.println(">");
-                response = sc.nextInt();
-                if (response == 1) {
+            System.out.print("> ");
+            response = sc.nextInt();
+            if (response == 1) {
+                try {
                     doLogin();
                     System.out.println("Login Successful");
                     systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
                     menuMain();
-                } else if (response == 2) {
-                    break;
-                } else {
-                    System.out.println("Invalid input, try again!");
+                } catch (InvalidLoginCredentialException ex) {
+                    System.out.println(ex.getMessage() + "\n");
                 }
+            } else if (response == 2) {
+                break;
+            } else {
+                System.out.println("Invalid input, try again!");
             }
         }
-        
     }
 
     private void doLogin() throws InvalidLoginCredentialException {
-        Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
         
         System.out.println("Login: ");
         System.out.print("Enter username> ");
-        username = scanner.nextLine().trim();
+        username = sc.nextLine().trim();
         System.out.print("Enter password> ");
-        password = scanner.nextLine().trim();
+        password = sc.nextLine().trim();
         
         if(username.length() > 0 && password.length() > 0)
         {
@@ -92,15 +94,15 @@ public class MainApp {
             System.out.println("1: System Administration");
             System.out.println("99: Logout"); // high so we can add more stuff
             response = 0;
+            System.out.print("> ");
+            response = sc.nextInt();
             
-            while (response < 0 || response > 99) { // CHANGE WHEN ADD MORE COMMANDS
-                System.out.println(">");
-                response = sc.nextInt();
                 if (response == 1) {
                     systemAdminModule.menuSystemAdmin();
                 } else if (response == 99) {
                     break;
-                }
+                } else {
+                    System.out.println("Invalid input, try again!");
             }
         }
     }
