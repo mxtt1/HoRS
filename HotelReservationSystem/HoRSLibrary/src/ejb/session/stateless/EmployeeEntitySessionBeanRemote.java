@@ -21,6 +21,7 @@ public interface EmployeeEntitySessionBeanRemote {
     List<EmployeeEntity> retrieveAllEmployees();
 
     EmployeeEntity retrieveEmployeeByUsername(String username);
+    
     public EmployeeEntity employeeLogin(String username, String password) throws InvalidLoginCredentialException;
 
 }

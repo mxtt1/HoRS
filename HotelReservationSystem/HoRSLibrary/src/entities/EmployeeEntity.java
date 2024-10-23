@@ -43,7 +43,7 @@ public class EmployeeEntity implements Serializable {
 
     public EmployeeEntity() {
     }
-
+    
     public EmployeeEntity(EmployeeRole employeeRole, String username, String password, String fullName) {
         this.employeeRole = employeeRole;
         this.username = username;
