@@ -24,7 +24,7 @@ public class MainApp {
     
     private EmployeeEntity currentEmployeeEntity;
     
-    Scanner sc = new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
     
     
     public MainApp() {
@@ -40,27 +40,31 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         Integer response = 0;
         
-        while(true) {
-            System.out.println("Welcome to HoRS Management Client");
+        while (true) {
+            System.out.println("\nWelcome to HoRS Management Client");
             System.out.println("1: Login");
             System.out.println("2: Exit");
             response = 0;
-            System.out.print("> ");
-            response = sc.nextInt();
-            if (response == 1) {
-                try {
-                    doLogin();
-                    System.out.println("Login Successful");
-                    systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
-                    menuMain();
-                } catch (InvalidLoginCredentialException ex) {
-                    System.out.println(ex.getMessage() + "\n");
+
+            while (response < 1 || response > 99) {
+                System.out.print("> ");
+                response = sc.nextInt();
+                if (response == 1) {
+                    try {
+                        doLogin();
+                        System.out.println("Login Successful");
+                        systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
+                        menuMain();
+                    } catch (InvalidLoginCredentialException ex) {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
+                } else if (response == 2) {
+                    break;
+                } else {
+                    System.out.println("Invalid input, try again!");
                 }
-            } else if (response == 2) {
-                break;
-            } else {
-                System.out.println("Invalid input, try again!");
             }
+            if (response == 2) break;
         }
     }
 
@@ -87,22 +91,33 @@ public class MainApp {
     private void menuMain() throws InvalidAccessRightException {
         Scanner sc = new Scanner(System.in);
         Integer response = 0;
-        
+
         while (true) {
-            System.out.println("HoRS Management Client");
+            System.out.println("\nHoRS Management Client");
             System.out.println("You are logged in as " + currentEmployeeEntity.getFullName());
             System.out.println("1: System Administration");
             System.out.println("99: Logout"); // high so we can add more stuff
             response = 0;
-            System.out.print("> ");
-            response = sc.nextInt();
-            
+
+            while (response < 1 || response > 99) {
+                System.out.print("> ");
+                response = sc.nextInt();
+
                 if (response == 1) {
-                    systemAdminModule.menuSystemAdmin();
+                    try {
+                        systemAdminModule.menuSystemAdmin();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 } else if (response == 99) {
                     break;
                 } else {
                     System.out.println("Invalid input, try again!");
+                }
+            }
+
+            if (response == 99) {
+                break;
             }
         }
     }

@@ -7,9 +7,11 @@ package horsmanagementclient;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
+import java.util.List;
 import java.util.Scanner;
 import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -20,6 +22,8 @@ public class SystemAdminModule {
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     
     private EmployeeEntity currentEmployeeEntity;
+    
+    private final Scanner sc = new Scanner(System.in);
     
     public SystemAdminModule() {
         
@@ -38,22 +42,94 @@ public class SystemAdminModule {
         if (currentEmployeeEntity.getEmployeeRole() != EmployeeRole.SYSTEM_ADMIN) {
             throw new InvalidAccessRightException("You don't have SYSTEM_ADMIN rights to access the system administration module.");
         }
-        
+
         Scanner sc = new Scanner(System.in);
         Integer response = 0;
         while (true) {
-            System.out.println("HoRS System :: System Administration");
-            System.out.println("1. New Function");
+            System.out.println("\nHoRS System :: System Administration");
+            System.out.println("1. Create New Employee");
+            System.out.println("2. View All Employees");
+            System.out.println("99. Exit");
             response = 0;
-            
-            while(response < 1 || response > 99) {
-                System.out.println(">");
+
+            while (response < 1 || response > 99) {
+                System.out.print("> ");
                 response = sc.nextInt();
                 if (response == 1) {
-                    // NEW METHOD
+                    try {
+                        doCreateNewEmployee();
+                    } catch (InvalidLoginCredentialException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                } else if (response == 2) {
+                    doViewAllEmployees();
+                } else if (response == 99) {
+                    break;
+                } else {
+                    System.out.println("Invalid input, try again!");
                 }
             }
+            if (response == 99) {
+                break;
+            }
         }
+    }
+
+
+
+    private void doCreateNewEmployee() throws InvalidLoginCredentialException {
+        String username;
+        String password;
+        String fullname;
+        EmployeeRole employeeRole = EmployeeRole.SYSTEM_ADMIN;
+                
+        System.out.println("\nCreate New Employee Account: ");
+        System.out.print("Enter username> ");
+        username = sc.nextLine().trim();
+        System.out.print("Enter password> ");
+        password = sc.nextLine().trim();
+        System.out.print("Enter full name> ");
+        fullname = sc.nextLine().trim();
+        
+        System.out.println("Choose access right");
+        System.out.println("1: System Administrator");
+        System.out.println("2: Operation Manager");
+        System.out.println("3: Sales Manager");
+        System.out.println("4: Guest Relation Officer");
+        int response = 0;
+
+        while (response < 1 || response > 5) {
+            System.out.print("> ");
+            response = sc.nextInt();
+            if (response == 1) {
+                employeeRole = EmployeeRole.SYSTEM_ADMIN;
+            } else if (response == 2) {
+                employeeRole = EmployeeRole.OPS_MANAGER;
+            } else if (response == 3) {
+                employeeRole = EmployeeRole.SALES_MANAGER;
+            } else if (response == 4) {
+                employeeRole = EmployeeRole.GRO;   
+            } else {
+                System.out.println("Invalid input, try again!");
+            }
+        }
+        if(username.length() > 0 && password.length() > 0 && fullname.length() > 0) {
+            EmployeeEntity newEmployee = new EmployeeEntity(employeeRole, username, password, fullname);
+            employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
+        } else {
+             throw new InvalidLoginCredentialException("Missing login credential!");
+        }
+    }
+
+    private void doViewAllEmployees() {
+        System.out.println("\nViewing All Employee Records:\n");
+        List<EmployeeEntity> employees = employeeEntitySessionBeanRemote.retrieveAllEmployees();
+        for (EmployeeEntity e : employees) {
+            System.out.println("ID: " + e.getId() + " Full Name: " + e.getFullName() + 
+                    " Username: " + e.getUsername() + " Password: " + e.getPassword());
+        }
+        System.out.print("\nPress any key to continue.");
+        System.in.read();
     }
     
 }
