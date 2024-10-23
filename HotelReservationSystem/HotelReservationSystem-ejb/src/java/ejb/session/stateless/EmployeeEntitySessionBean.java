@@ -8,6 +8,7 @@ import entities.EmployeeEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import util.exception.InvalidLoginCredentialException;
 
@@ -28,6 +29,7 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
     @Override
     public long createNewEmployee(EmployeeEntity newEmployee) {
         em.persist(newEmployee);
+        em.flush();
         return newEmployee.getId();
     }
 
@@ -47,13 +49,16 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
     
     @Override
     public EmployeeEntity employeeLogin(String username, String password) throws InvalidLoginCredentialException {
-        List<EmployeeEntity> allEmployees = retrieveAllEmployees();
-        for (EmployeeEntity employee : allEmployees) {
-            if (employee.getUsername().equals(username) && employee.getPassword().equals(password)) {
-                return employee;
+        try {
+            EmployeeEntity currentEmployee = this.retrieveEmployeeByUsername(username);
+            if (currentEmployee.getPassword().equals(password)) {
+                return currentEmployee;
+            } else {
+                throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
             }
+        } catch (NoResultException ex) {
+            throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
         }
-        throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
     }
     
     
