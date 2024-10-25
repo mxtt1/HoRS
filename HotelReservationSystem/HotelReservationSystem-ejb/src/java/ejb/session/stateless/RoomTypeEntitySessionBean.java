@@ -28,6 +28,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     @Override
     public long createNewRoomType(RoomTypeEntity newRoomType) {
         em.persist(newRoomType);
+        em.flush();
         return newRoomType.getId();
     }
 
@@ -40,30 +41,31 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     public void setRoomTypeRanking(int ranking, long roomId) {
         List<RoomTypeEntity> roomTypes = this.retrieveAllRoomTypes();
         RoomTypeEntity roomTypeToSetRanking = em.find(RoomTypeEntity.class, roomId);
-        
+
         roomTypeToSetRanking.setRanking(ranking);
-        
+
         for (RoomTypeEntity rt : roomTypes) {
             int currentRank = rt.getRanking();
-            if (rt != roomTypeToSetRanking && currentRank >= ranking) rt.setRanking(currentRank + 1);
+            if (rt != roomTypeToSetRanking && currentRank >= ranking) {
+                rt.setRanking(currentRank + 1);
+            }
         }
     }
-    
+
     @Override
     public RoomTypeEntity retrieveRoomType(long roomTypeId) {
         return em.find(RoomTypeEntity.class, roomTypeId);
     }
-    
+
     @Override
     public RoomTypeEntity retrieveRoomType(long roomTypeId, boolean loadRooms, boolean loadAllRates) {
         RoomTypeEntity retrievedRoomType = this.retrieveRoomType(roomTypeId);
-        if (loadRooms) retrievedRoomType.getRooms().size();
-        if(loadAllRates) retrievedRoomType.getAllRates().size();
+        if (loadRooms) {
+            retrievedRoomType.getRooms().size();
+        }
+        if (loadAllRates) {
+            retrievedRoomType.getAllRates().size();
+        }
         return retrievedRoomType;
     }
-
-
-    
-    
-    
 }
