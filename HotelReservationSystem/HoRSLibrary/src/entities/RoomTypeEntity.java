@@ -30,7 +30,7 @@ public class RoomTypeEntity implements Serializable {
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
-    private long roomSize;
+    private int roomSize;
     @Column(nullable = false, length = 32)
     private String bedType;
     @Column(nullable = false)
@@ -53,8 +53,19 @@ public class RoomTypeEntity implements Serializable {
     
     @OneToMany (mappedBy = "roomType")
     private List<RoomEntity> rooms;
-
+    
     public RoomTypeEntity() {
+        this.disabled = false;
+    }
+
+    public RoomTypeEntity(String name, String description, String bedType, String amenities, int capacity, int roomSize) {
+        this.name = name;
+        this.description = description;
+        this.roomSize = roomSize;
+        this.bedType = bedType;
+        this.capacity = capacity;
+        this.amenities = amenities;
+        this.ranking = 0;
         this.disabled = false;
     }
     
@@ -156,11 +167,11 @@ public class RoomTypeEntity implements Serializable {
         this.publishedRate = publishedRate;
     }
 
-    public long getRoomSize() {
+    public int getRoomSize() {
         return roomSize;
     }
 
-    public void setRoomSize(long roomSize) {
+    public void setRoomSize(int roomSize) {
         this.roomSize = roomSize;
     }
 
