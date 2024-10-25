@@ -21,6 +21,7 @@ public class MainApp {
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     
     private SystemAdminModule systemAdminModule;
+    private HotelOperationModule hotelOperationModule;
     
     private EmployeeEntity currentEmployeeEntity;
     
@@ -54,6 +55,7 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login Successful");
                         systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
+                        hotelOperationModule = new HotelOperationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println(ex.getMessage() + "\n");
@@ -96,6 +98,7 @@ public class MainApp {
             System.out.println("\nHoRS Management Client");
             System.out.println("You are logged in as " + currentEmployeeEntity.getFullName());
             System.out.println("1: System Administration");
+            System.out.println("2: Hotel Operation");
             System.out.println("99: Logout"); // high so we can add more stuff
             response = 0;
 
@@ -106,6 +109,12 @@ public class MainApp {
                 if (response == 1) {
                     try {
                         systemAdminModule.menuSystemAdmin();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                } else if (response == 2) {
+                    try {
+                        hotelOperationModule.menuHotelOperation();
                     } catch (InvalidAccessRightException ex) {
                         System.out.println(ex.getMessage());
                     }
