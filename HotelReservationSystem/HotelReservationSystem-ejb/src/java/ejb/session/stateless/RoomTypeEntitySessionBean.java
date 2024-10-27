@@ -58,24 +58,8 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         RoomTypeEntity roomType = em.createQuery("SELECT e FROM RoomTypeEntity e WHERE e.name = :roomName", RoomTypeEntity.class)
              .setParameter("roomName", roomTypeName)
              .getSingleResult();
+        roomType.getRooms().size();
         return roomType;
-    }
-    
-    @Override
-    public RoomTypeEntity retrieveRoomType(long roomTypeId) throws NoResultException{
-        return em.find(RoomTypeEntity.class, roomTypeId);
-    }
-
-    @Override
-    public RoomTypeEntity retrieveRoomType(long roomTypeId, boolean loadRooms, boolean loadAllRates) throws NoResultException{
-        RoomTypeEntity retrievedRoomType = this.retrieveRoomType(roomTypeId);
-        if (loadRooms) {
-            retrievedRoomType.getRooms().size();
-        }
-        if (loadAllRates) {
-            retrievedRoomType.getAllRates().size();
-        }
-        return retrievedRoomType;
     }
 
     @Override

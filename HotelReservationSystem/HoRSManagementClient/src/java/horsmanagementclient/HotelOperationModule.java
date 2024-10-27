@@ -118,9 +118,11 @@ public class HotelOperationModule {
         System.out.println("New room type created succesfully!");
     }
     
-    private void doViewRoomTypeDetails() {
+    private void doViewRoomTypeDetails() throws InvalidAccessRightException {
+        sc.nextLine(); // eat line
         System.out.println("Enter Name Of Room Type: ");
-        String roomTypeName = sc.nextLine().trim();
+        String roomTypeName = sc.nextLine();
+        System.out.println("DEBUG: User input received: " + roomTypeName); // Debugging line
         RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
         System.out.println("Room Name: " + roomType.getName());
         System.out.println("Room Description: " + roomType.getDescription());
@@ -130,10 +132,6 @@ public class HotelOperationModule {
         System.out.println("Amenities: " + roomType.getAmenities());
         
         System.out.println("Press any key to continue.");
-        try {
-            System.in.read();
-        } catch (IOException ex) {
-            Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        sc.next();
     }
 }
