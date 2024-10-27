@@ -5,6 +5,7 @@
 package horsmanagementclient;
 
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
+import ejb.session.stateless.PartnerEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
 import java.util.Scanner;
@@ -19,6 +20,7 @@ import util.exception.InvalidLoginCredentialException;
 public class MainApp {
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+    private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
     
     private SystemAdminModule systemAdminModule;
     private HotelOperationModule hotelOperationModule;
@@ -32,9 +34,10 @@ public class MainApp {
         
     }
     
-    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote) {
+    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
+        this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
     }
     
     public void runApp() throws InvalidLoginCredentialException, InvalidAccessRightException {
@@ -54,7 +57,7 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login Successful");
-                        systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
+                        systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployeeEntity);
                         hotelOperationModule = new HotelOperationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployeeEntity);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {

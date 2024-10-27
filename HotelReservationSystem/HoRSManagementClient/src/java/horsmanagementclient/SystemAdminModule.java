@@ -5,8 +5,10 @@
 package horsmanagementclient;
 
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
+import ejb.session.stateless.PartnerEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
+import entities.PartnerEntity;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
@@ -23,6 +25,7 @@ import util.exception.InvalidLoginCredentialException;
 public class SystemAdminModule {
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+    private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
     
     private EmployeeEntity currentEmployeeEntity;
     
@@ -33,11 +36,13 @@ public class SystemAdminModule {
     }
     
     public SystemAdminModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, 
-            RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity) 
+            RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, 
+            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote,  EmployeeEntity currEmployeeEntity) 
     {
         this();
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
+        this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
     }
     
@@ -52,6 +57,8 @@ public class SystemAdminModule {
             System.out.println("\nHoRS System :: System Administration");
             System.out.println("1. Create New Employee");
             System.out.println("2. View All Employees");
+            System.out.println("3. Create New Partner");
+            System.out.println("4. View All Partners");
             System.out.println("99. Exit");
             response = 0;
 
@@ -66,6 +73,14 @@ public class SystemAdminModule {
                     }
                 } else if (response == 2) {
                     doViewAllEmployees();
+                } else if (response == 3) {
+                    try {
+                        doCreateNewPartner();
+                    } catch (InvalidLoginCredentialException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                } else if (response == 4) {
+                    doViewAllPartners();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -130,6 +145,38 @@ public class SystemAdminModule {
         for (EmployeeEntity e : employees) {
             System.out.println("ID: " + e.getId() + " Full Name: " + e.getFullName() + 
                     " Username: " + e.getUsername() + " Password: " + e.getPassword());
+        }
+        System.out.print("\nPress any key to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doCreateNewPartner() throws InvalidLoginCredentialException {
+        String username;
+        String password;                
+        System.out.println("\nCreate New Partner Account: ");
+        System.out.print("Enter username> ");
+        username = sc.nextLine().trim();
+        System.out.print("Enter password> ");
+        password = sc.nextLine().trim();
+        
+
+        if (username.length() > 0 && password.length() > 0) {
+            PartnerEntity newPartner = new PartnerEntity(username, password);
+            partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+        } else {
+             throw new InvalidLoginCredentialException("Missing login credential!");
+        }
+    }
+
+    private void doViewAllPartners() {
+        System.out.println("\nViewing All Partner Records:\n");
+        List<PartnerEntity> partners = partnerEntitySessionBeanRemote.retrieveAllPartners();
+        for (PartnerEntity p : partners) {
+            System.out.println("ID: " + p.getPartnerEntityId()+ "Username: " + p.getUsername());
         }
         System.out.print("\nPress any key to continue.");
         try {
