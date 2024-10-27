@@ -47,7 +47,7 @@ public class HotelOperationModule {
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
     }
-    
+
     public void menuHotelOperation() throws InvalidAccessRightException {
         if (currentEmployeeEntity.getEmployeeRole() == EmployeeRole.GRO) {
             throw new InvalidAccessRightException("You don't have rights to access the hotel operation module.");
@@ -59,6 +59,7 @@ public class HotelOperationModule {
             System.out.println("\nHoRS System :: Hotel Operation");
             System.out.println("1. Create New Room Type");
             System.out.println("2. View Room Type Details");
+            System.out.println("3. Update Room Type Details");
             System.out.println("99. Exit");
             response = 0;
 
@@ -69,6 +70,8 @@ public class HotelOperationModule {
                     doCreateNewRoomType();
                 } else if (response == 2) {
                     doViewRoomTypeDetails();
+                } else if (response == 3) {
+                    doUpdateRoomTypeRecord();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -88,7 +91,7 @@ public class HotelOperationModule {
         String amenities;
         int capacity;
         int roomSize;
-                
+
         System.out.println("\nCreate New Room Type: ");
         System.out.print("Enter name> ");
         name = sc.nextLine().trim();
@@ -102,27 +105,26 @@ public class HotelOperationModule {
         capacity = sc.nextInt();
         System.out.print("Enter room size in square metres> ");
         roomSize = sc.nextInt();
-        
+
         long newRoomTypeId = roomTypeEntitySessionBeanRemote.createNewRoomType(new RoomTypeEntity(name, description, bedType, amenities, capacity, roomSize));
-        
+
         List<RoomTypeEntity> allRoomTypes = roomTypeEntitySessionBeanRemote.retrieveAllRoomTypes();
         allRoomTypes.sort(new RankingComparator());
-        
+
         System.out.println("\nRoom Hierarchy (1 is highest): ");
         for (RoomTypeEntity roomType : allRoomTypes) {
-            System.out.println(roomType.getRanking() + ". "  + roomType.getName());
+            System.out.println(roomType.getRanking() + ". " + roomType.getName());
         }
         System.out.print("Enter ranking of new room (rooms currently at and below the ranking will be shifted downwards)> ");
         int newRoomTypeRanking = sc.nextInt();
         roomTypeEntitySessionBeanRemote.setRoomTypeRanking(newRoomTypeRanking, newRoomTypeId);
         System.out.println("New room type created succesfully!");
     }
-    
+
     private void doViewRoomTypeDetails() throws InvalidAccessRightException {
         sc.nextLine(); // eat line
         System.out.println("Enter Name Of Room Type: ");
         String roomTypeName = sc.nextLine();
-        System.out.println("DEBUG: User input received: " + roomTypeName); // Debugging line
         RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
         System.out.println("Room Name: " + roomType.getName());
         System.out.println("Room Description: " + roomType.getDescription());
@@ -130,8 +132,59 @@ public class HotelOperationModule {
         System.out.println("Bed: " + roomType.getBedType());
         System.out.println("Capacity: " + roomType.getCapacity());
         System.out.println("Amenities: " + roomType.getAmenities());
-        
+
         System.out.println("Press any key to continue.");
         sc.next();
+    }
+
+    private void doUpdateRoomTypeRecord() {
+        sc.nextLine();
+        System.out.println("Enter Name Of Room Type to Update: ");
+        String roomTypeName = sc.nextLine();
+        RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
+            System.out.println("1. Room Name: " + roomType.getName());
+            System.out.println("2. Room Description: " + roomType.getDescription());
+            System.out.println("3. Room Size: " + roomType.getRoomSize() + " square meters");
+            System.out.println("4. Bed: " + roomType.getBedType());
+            System.out.println("5. Capacity: " + roomType.getCapacity());
+            System.out.println("Select choice of update");
+            int command = sc.nextInt();
+            if (command == 5) {
+                System.out.println("Input New Capacity: ");
+                int newCapacity = sc.nextInt();
+                roomType.setCapacity(newCapacity);
+            } else if (command == 4) {
+                sc.nextLine();
+                System.out.println("Input New Bed Type: ");;
+                String newBedType = sc.nextLine().trim();
+                roomType.setBedType(newBedType);
+            } else if (command == 3) {
+                System.out.println("Input New Room Size: ");
+                int newRoomSize = sc.nextInt();
+                roomType.setRoomSize(newRoomSize);
+            } else if (command == 2) {
+                sc.nextLine();
+                System.out.println("Input new Room Description: ");
+                String newRoomDescription = sc.nextLine().trim();
+                roomType.setDescription(newRoomDescription);
+            } else if (command == 1) {
+                sc.nextLine();
+                System.out.println("Input new Room Name: ");
+                String newRoomName = sc.nextLine().trim();
+                roomType.setName(newRoomName);
+            }
+        
+        RoomTypeEntity newRoomType = roomTypeEntitySessionBeanRemote.updateRoomType(roomType);
+        System.out.println("Room Type Updated With Details: ");
+        System.out.println("Room Name: " + newRoomType.getName());
+        System.out.println("Room Description: " + newRoomType.getDescription());
+        System.out.println("Room Size: " + newRoomType.getRoomSize() + " square meters");
+        System.out.println("Bed: " + newRoomType.getBedType());
+        System.out.println("Capacity: " + newRoomType.getCapacity());
+        System.out.println("Amenities: " + newRoomType.getAmenities());
+
+        System.out.println("Press any key to continue.");
+        sc.next();
+
     }
 }

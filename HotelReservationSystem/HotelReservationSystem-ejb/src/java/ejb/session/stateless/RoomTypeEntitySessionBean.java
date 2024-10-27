@@ -82,5 +82,12 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         
     }
     
+    @Override
+    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType) {
+        em.merge(roomType);
+        em.flush();
+        return roomType;
+    }
+    
     
 }
