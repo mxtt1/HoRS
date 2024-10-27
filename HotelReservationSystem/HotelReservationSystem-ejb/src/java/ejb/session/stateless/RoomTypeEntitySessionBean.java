@@ -8,6 +8,7 @@ import entities.RoomTypeEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 /**
@@ -34,8 +35,8 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
     @Override
     public List<RoomTypeEntity> retrieveAllRoomTypes() {
-        return em.createQuery("SELECT rt FROM RoomTypeEntity rt", RoomTypeEntity.class).getResultList();
-    }
+        return em.createQuery("SELECT rt FROM RoomTypeEntity rt WHERE rt.disabled = FALSE", RoomTypeEntity.class).getResultList();
+    } 
 
     @Override
     public void setRoomTypeRanking(int ranking, long roomId) {
@@ -53,12 +54,12 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public RoomTypeEntity retrieveRoomType(long roomTypeId) {
+    public RoomTypeEntity retrieveRoomType(long roomTypeId) throws NoResultException{
         return em.find(RoomTypeEntity.class, roomTypeId);
     }
 
     @Override
-    public RoomTypeEntity retrieveRoomType(long roomTypeId, boolean loadRooms, boolean loadAllRates) {
+    public RoomTypeEntity retrieveRoomType(long roomTypeId, boolean loadRooms, boolean loadAllRates) throws NoResultException{
         RoomTypeEntity retrievedRoomType = this.retrieveRoomType(roomTypeId);
         if (loadRooms) {
             retrievedRoomType.getRooms().size();
@@ -68,4 +69,26 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         }
         return retrievedRoomType;
     }
+
+    @Override
+    public void deleteRoomType(long roomTypeId) throws NoResultException{
+        RoomTypeEntity roomTypeToDelete = em.find(RoomTypeEntity.class, roomTypeId);
+        List<RoomTypeEntity> roomTypes = this.retrieveAllRoomTypes();
+
+        for (RoomTypeEntity rt : roomTypes) {
+            int currentRank = rt.getRanking();
+            if (currentRank > roomTypeToDelete.getRanking()) {
+                rt.setRanking(currentRank - 1);
+            }
+        }
+        
+        if (!roomTypeToDelete.getRooms().isEmpty() || !roomTypeToDelete.getAllRates().isEmpty() || !roomTypeToDelete.getReservations().isEmpty()) {
+            roomTypeToDelete.setDisabled(true);
+        } else {
+            em.remove(roomTypeToDelete);
+        }
+        
+    }
+    
+    
 }

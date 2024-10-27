@@ -4,23 +4,21 @@
  */
 package ejb.session.stateless;
 
+import entities.RoomEntity;
 import entities.RoomTypeEntity;
 import java.util.List;
 import javax.ejb.Local;
+import javax.persistence.NoResultException;
 
 /**
  *
  * @author mattl
  */
 @Local
-public interface RoomTypeEntitySessionBeanLocal {
-
-    long createNewRoomType(RoomTypeEntity newRoomType);
-
-    List<RoomTypeEntity> retrieveAllRoomTypes();
-
-    RoomTypeEntity retrieveRoomType(long roomTypeId);
-
-    void deleteRoomType(long roomTypeId);
+public interface RoomEntitySessionBeanLocal {
     
+    public List<RoomEntity> retrieveAllRooms();
+
+    public RoomEntity retrieveRoom(long roomId) throws NoResultException;
+
 }
