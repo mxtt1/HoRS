@@ -25,4 +25,6 @@ public interface RoomTypeEntitySessionBeanRemote {
 
     void deleteRoomType(long roomTypeId);
     
+    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName);
+    
 }

@@ -54,6 +54,14 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
+    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName) {
+        RoomTypeEntity roomType = em.createQuery("SELECT e FROM RoomTypeEntity e WHERE e.name = :roomName", RoomTypeEntity.class)
+             .setParameter("roomName", roomTypeName)
+             .getSingleResult();
+        return roomType;
+    }
+    
+    @Override
     public RoomTypeEntity retrieveRoomType(long roomTypeId) throws NoResultException{
         return em.find(RoomTypeEntity.class, roomTypeId);
     }

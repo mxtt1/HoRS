@@ -22,5 +22,7 @@ public interface RoomTypeEntitySessionBeanLocal {
     RoomTypeEntity retrieveRoomType(long roomTypeId);
 
     void deleteRoomType(long roomTypeId);
+
+    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName);
     
 }

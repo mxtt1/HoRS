@@ -8,9 +8,12 @@ import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
 import entities.RoomTypeEntity;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -65,7 +68,7 @@ public class HotelOperationModule {
                 if (response == 1) {
                     doCreateNewRoomType();
                 } else if (response == 2) {
-                    break;
+                    doViewRoomTypeDetails();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -105,7 +108,7 @@ public class HotelOperationModule {
         List<RoomTypeEntity> allRoomTypes = roomTypeEntitySessionBeanRemote.retrieveAllRoomTypes();
         allRoomTypes.sort(new RankingComparator());
         
-        System.out.println("\nRoom Hierarchy (1 is highest: ");
+        System.out.println("\nRoom Hierarchy (1 is highest): ");
         for (RoomTypeEntity roomType : allRoomTypes) {
             System.out.println(roomType.getRanking() + ". "  + roomType.getName());
         }
@@ -113,5 +116,24 @@ public class HotelOperationModule {
         int newRoomTypeRanking = sc.nextInt();
         roomTypeEntitySessionBeanRemote.setRoomTypeRanking(newRoomTypeRanking, newRoomTypeId);
         System.out.println("New room type created succesfully!");
+    }
+    
+    private void doViewRoomTypeDetails() {
+        System.out.println("Enter Name Of Room Type: ");
+        String roomTypeName = sc.nextLine().trim();
+        RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
+        System.out.println("Room Name: " + roomType.getName());
+        System.out.println("Room Description: " + roomType.getDescription());
+        System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
+        System.out.println("Bed: " + roomType.getBedType());
+        System.out.println("Capacity: " + roomType.getCapacity());
+        System.out.println("Amenities: " + roomType.getAmenities());
+        
+        System.out.println("Press any key to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
