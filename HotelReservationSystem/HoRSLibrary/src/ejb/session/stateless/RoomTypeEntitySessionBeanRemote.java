@@ -25,4 +25,6 @@ public interface RoomTypeEntitySessionBeanRemote {
     
     public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName);
     
+    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType);
+    
 }
