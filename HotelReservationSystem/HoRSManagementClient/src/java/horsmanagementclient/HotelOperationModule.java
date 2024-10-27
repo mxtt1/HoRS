@@ -119,7 +119,7 @@ public class HotelOperationModule {
     }
     
     private void doViewRoomTypeDetails() throws InvalidAccessRightException {
-        sc.nextLine();
+        sc.nextLine(); // eat line
         System.out.println("Enter Name Of Room Type: ");
         String roomTypeName = sc.nextLine();
         System.out.println("DEBUG: User input received: " + roomTypeName); // Debugging line
