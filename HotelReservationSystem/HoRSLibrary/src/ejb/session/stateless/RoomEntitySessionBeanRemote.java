@@ -1,0 +1,28 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/J2EE/EJB30/SessionRemote.java to edit this template
+ */
+package ejb.session.stateless;
+
+import entities.RoomEntity;
+import entities.RoomTypeEntity;
+import java.util.List;
+import javax.ejb.Remote;
+import javax.persistence.NoResultException;
+
+/**
+ *
+ * @author mattl
+ */
+@Remote
+public interface RoomEntitySessionBeanRemote {
+
+    public long createNewRoom(RoomEntity newRoom, long roomTypeId) throws NoResultException;
+
+    public List<RoomEntity> retrieveAllRooms();
+
+    public RoomEntity retrieveRoom(long roomId, boolean loadReservations);
+
+    public void deleteRoom(long roomId);
+
+}

@@ -36,6 +36,8 @@ public class RoomEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoomStatus roomStatus;
+    @Column(nullable = false)
+    private boolean disabled;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -46,6 +48,15 @@ public class RoomEntity implements Serializable {
     
     @OneToOne()
     private ReservationEntity currentReservation;
+
+    public RoomEntity() {
+    }
+
+    public RoomEntity(String roomNumber) {
+        this.roomNumber = roomNumber;
+        roomStatus = RoomStatus.AVAILABLE;
+        disabled = false;
+    }
 
     public Long getId() {
         return id;
@@ -118,6 +129,14 @@ public class RoomEntity implements Serializable {
 
     public void setCurrentReservation(ReservationEntity currentReservation) {
         this.currentReservation = currentReservation;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
     
 }

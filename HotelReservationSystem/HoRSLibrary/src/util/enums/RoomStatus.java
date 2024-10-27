@@ -10,6 +10,5 @@ package util.enums;
  */
 public enum RoomStatus {
     AVAILABLE,
-    OCCUPIED,
-    DISABLED
+    OCCUPIED
 }

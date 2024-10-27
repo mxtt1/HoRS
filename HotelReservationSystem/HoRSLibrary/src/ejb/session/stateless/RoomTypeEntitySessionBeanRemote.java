@@ -22,5 +22,7 @@ public interface RoomTypeEntitySessionBeanRemote {
     void setRoomTypeRanking(int ranking, long roomId);
 
     RoomTypeEntity retrieveRoomType(long roomTypeId, boolean loadRooms, boolean loadAllRates);
+
+    void deleteRoomType(long roomTypeId);
     
 }

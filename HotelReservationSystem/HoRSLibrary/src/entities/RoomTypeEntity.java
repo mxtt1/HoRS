@@ -54,6 +54,9 @@ public class RoomTypeEntity implements Serializable {
     @OneToMany (mappedBy = "roomType")
     private List<RoomEntity> rooms;
     
+    @OneToMany
+    private List<ReservationEntity> reservations;
+    
     public RoomTypeEntity() {
         this.disabled = false;
     }
@@ -189,6 +192,22 @@ public class RoomTypeEntity implements Serializable {
 
     public void setRooms(List<RoomEntity> rooms) {
         this.rooms = rooms;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public List<ReservationEntity> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<ReservationEntity> reservations) {
+        this.reservations = reservations;
     }
     
 }
