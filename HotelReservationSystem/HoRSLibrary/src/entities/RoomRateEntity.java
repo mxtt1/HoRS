@@ -6,7 +6,7 @@ package entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 import util.enums.RateType;
 
 /**
@@ -39,8 +40,10 @@ public class RoomRateEntity implements Serializable {
     @Column(nullable = false)
     private boolean disabled;
     
-    private LocalDate startDate;
-    private LocalDate endDate;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date startDate;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date endDate;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -109,19 +112,19 @@ public class RoomRateEntity implements Serializable {
         this.ratePerNight = ratePerNight;
     }
 
-    public LocalDate getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

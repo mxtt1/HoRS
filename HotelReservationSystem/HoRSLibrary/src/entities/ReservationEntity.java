@@ -5,7 +5,7 @@
 package entities;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -28,9 +29,11 @@ public class ReservationEntity implements Serializable {
     @Column(nullable = false, length = 100)
     private String guestName;
     @Column(nullable = false)
-    private LocalDate startDate;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date startDate;
     @Column(nullable = false)
-    private LocalDate endDate;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date endDate;
     
     @ManyToOne()
     private EmployeeEntity employee;
@@ -86,19 +89,19 @@ public class ReservationEntity implements Serializable {
         this.guestName = guestName;
     }
 
-    public LocalDate getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

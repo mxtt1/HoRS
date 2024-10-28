@@ -54,7 +54,7 @@ public class RoomTypeEntity implements Serializable {
     @OneToMany (mappedBy = "roomType")
     private List<RoomEntity> rooms;
     
-    @OneToMany
+    @OneToMany(mappedBy = "roomType")
     private List<ReservationEntity> reservations;
     
     public RoomTypeEntity() {

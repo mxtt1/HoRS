@@ -17,7 +17,7 @@ import javax.persistence.NoResultException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public long createNewRoom(RoomEntity newRoom, long roomTypeId) throws NoResultException;
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException;
 
     public List<RoomEntity> retrieveAllRooms();
 

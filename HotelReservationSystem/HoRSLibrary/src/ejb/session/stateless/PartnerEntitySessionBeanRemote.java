@@ -14,6 +14,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface PartnerEntitySessionBeanRemote {
+    
     public long createNewPartner(PartnerEntity newPartner);
 
     public List<PartnerEntity> retrieveAllPartners();
