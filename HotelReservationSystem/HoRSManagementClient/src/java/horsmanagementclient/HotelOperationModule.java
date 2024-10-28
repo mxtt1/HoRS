@@ -71,6 +71,7 @@ public class HotelOperationModule {
             System.out.println("6. Create New Room");
             System.out.println("7. Update Room");
             System.out.println("8. Delete Room");
+            System.out.println("9. View All Rooms");
             System.out.println("99. Exit");
             response = 0;
 
@@ -93,6 +94,8 @@ public class HotelOperationModule {
                     doUpdateRoom();
                 } else if (response == 8) {
                     doDeleteRoom();
+                } else if (response == 9) {
+                    doViewAllRooms();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -249,7 +252,6 @@ public class HotelOperationModule {
     }
 
     private void doCreateNewRoom() {
-        sc.nextLine();
         System.out.println("\nCreate New Room: ");
         System.out.print("Enter room number> ");
         String roomNumber = sc.nextLine().trim();
@@ -319,6 +321,18 @@ public class HotelOperationModule {
             System.out.println("Room" + roomToBeDeleted.getRoomNumber()+ " deleted!");
         } else {
             System.out.println("Deletion cancelled!");
+        }
+    }
+
+    private void doViewAllRooms() {
+        System.out.println("\nViewing All Rooms:\n");
+        List<RoomEntity> rooms = roomEntitySessionBeanRemote.retrieveAllRooms();
+        
+        for (RoomEntity room : rooms) {
+            if (room.isDisabled()) {
+                System.out.println("(DISABLED)");
+            }
+            System.out.println("ID: " + room.getId() + " Name: " + room.getRoomNumber() + " Status: " + room.getRoomStatus().name() + " Type: " + room.getRoomType().getName());
         }
     }
 }
