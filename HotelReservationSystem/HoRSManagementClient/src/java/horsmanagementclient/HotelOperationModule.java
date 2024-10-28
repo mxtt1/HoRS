@@ -23,6 +23,7 @@ import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 import util.RankingComparator;
+import util.enums.RoomStatus;
 
 /**
  *
@@ -68,6 +69,7 @@ public class HotelOperationModule {
             System.out.println("4. Delete Room Type");
             System.out.println("5. View All Room Types");
             System.out.println("6. Create New Room");
+            System.out.println("7. Update Room");
             System.out.println("99. Exit");
             response = 0;
 
@@ -86,6 +88,8 @@ public class HotelOperationModule {
                     doViewAllRoomTypeRecords();
                 } else if (response == 6) {
                     doCreateNewRoom();
+                } else if (response == 7) {
+                    doUpdateRoom();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -251,5 +255,51 @@ public class HotelOperationModule {
         
         long newRoomId = roomEntitySessionBeanRemote.createNewRoom(new RoomEntity(roomNumber), roomTypeName);
         System.out.println("New room created successfully!");
+    }
+
+    private void doUpdateRoom() {
+        System.out.println("Update Room: ");
+        System.out.println("Enter Name Of Room to Update> ");
+        String roomName = sc.nextLine().trim();
+
+        RoomEntity roomEntity = roomEntitySessionBeanRemote.retrieveRoomByName(roomName);
+        System.out.println("1. Room Name: " + roomEntity.getRoomNumber());
+        System.out.println("2. Room Type: " + roomEntity.getRoomType().getName());
+        System.out.println("3. Room Status: " + roomEntity.getRoomStatus().name());
+        System.out.print("Select choice of update> ");
+        int command = sc.nextInt();
+        if (command == 3) {
+            System.out.print("Input New Room Status> ");
+            System.out.println("1. AVAILABLE");
+            System.out.println("2. OCCUPIED");
+            int input = sc.nextInt();
+            if (input == 1) {
+                roomEntity.setRoomStatus(RoomStatus.AVAILABLE);
+            } else if (input == 2) {
+                roomEntity.setRoomStatus(RoomStatus.OCCUPIED);
+            }
+        } else if (command == 2) {
+            sc.nextLine();
+            System.out.print("Input new Room Type> ");
+            String newRoomType = sc.nextLine().trim();
+            RoomTypeEntity newRoomTypeEntity = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(newRoomType);
+            roomEntity.setRoomType(newRoomTypeEntity);
+        } else if (command == 1) {
+            sc.nextLine();
+            System.out.print("Input new Room Name> ");
+            String newRoomName = sc.nextLine().trim();
+            roomEntity.setRoomNumber(newRoomName);
+        }
+        RoomEntity newRoom = roomEntitySessionBeanRemote.updateRoom(roomEntity);
+        System.out.println("\nRoom Updated With Details: ");
+        System.out.println("Room Name: " + newRoom.getRoomNumber());
+        System.out.println("Room Type: " + newRoom.getRoomType().getName());
+        System.out.println("Room Status: " + newRoom.getRoomStatus().name());
+        System.out.println("Press any key to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
