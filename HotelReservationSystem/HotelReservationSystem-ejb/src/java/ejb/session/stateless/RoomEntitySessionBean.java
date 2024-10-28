@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entities.RoomEntity;
 import entities.RoomTypeEntity;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -19,12 +20,16 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomEntitySessionBeanLocal {
 
+    @EJB
+    private RoomTypeEntitySessionBeanLocal roomTypeEntitySessionBean;
+
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
+ 
 
-   @Override
-    public long createNewRoom(RoomEntity newRoom, long roomTypeId) throws NoResultException{
-        RoomTypeEntity roomType = em.find(RoomTypeEntity.class, roomTypeId);
+    @Override
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException{
+        RoomTypeEntity roomType = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomTypeName);
         roomType.getRooms().add(newRoom);
         newRoom.setRoomType(roomType);
         
@@ -60,6 +65,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         if (roomToBeDeleted.getCurrentReservation() != null) {
             roomToBeDeleted.setDisabled(true);
         } else {
+            roomToBeDeleted.getRoomType().getRooms().remove(roomToBeDeleted);
             em.remove(roomToBeDeleted);
         }
     }

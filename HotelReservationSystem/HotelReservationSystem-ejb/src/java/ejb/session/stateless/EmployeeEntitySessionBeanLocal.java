@@ -19,6 +19,8 @@ public interface EmployeeEntitySessionBeanLocal {
     long createNewEmployee(EmployeeEntity newEmployee);
 
     List<EmployeeEntity> retrieveAllEmployees();
+    
+    public EmployeeEntity retrieveEmployeeByUsername(String username); 
 
     public EmployeeEntity employeeLogin(String username, String password) throws InvalidLoginCredentialException;
     

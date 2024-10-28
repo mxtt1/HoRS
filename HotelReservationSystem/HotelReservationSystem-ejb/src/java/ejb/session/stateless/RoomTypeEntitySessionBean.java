@@ -35,7 +35,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
     @Override
     public List<RoomTypeEntity> retrieveAllRoomTypes() {
-        return em.createQuery("SELECT rt FROM RoomTypeEntity rt WHERE rt.disabled = FALSE", RoomTypeEntity.class).getResultList();
+        return em.createQuery("SELECT rt FROM RoomTypeEntity rt", RoomTypeEntity.class).getResultList();
     } 
 
     @Override
@@ -47,14 +47,14 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
         for (RoomTypeEntity rt : roomTypes) {
             int currentRank = rt.getRanking();
-            if (rt != roomTypeToSetRanking && currentRank >= ranking) {
+            if (rt != roomTypeToSetRanking && currentRank >= ranking && !rt.isDisabled()) {
                 rt.setRanking(currentRank + 1);
             }
         }
     }
 
     @Override
-    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName) {
+    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName) throws NoResultException{
         RoomTypeEntity roomType = em.createQuery("SELECT e FROM RoomTypeEntity e WHERE e.name = :roomName", RoomTypeEntity.class)
              .setParameter("roomName", roomTypeName)
              .getSingleResult();
@@ -69,7 +69,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
         for (RoomTypeEntity rt : roomTypes) {
             int currentRank = rt.getRanking();
-            if (currentRank > roomTypeToDelete.getRanking()) {
+            if (currentRank > roomTypeToDelete.getRanking() && !rt.isDisabled()) {
                 rt.setRanking(currentRank - 1);
             }
         }
