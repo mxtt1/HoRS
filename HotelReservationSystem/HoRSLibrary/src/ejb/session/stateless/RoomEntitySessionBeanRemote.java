@@ -24,5 +24,7 @@ public interface RoomEntitySessionBeanRemote {
     public RoomEntity retrieveRoom(long roomId, boolean loadReservations);
 
     public void deleteRoom(long roomId);
-
+    
+    public RoomEntity retrieveRoomByName(String roomName) throws NoResultException;
+    public RoomEntity updateRoom(RoomEntity room);
 }

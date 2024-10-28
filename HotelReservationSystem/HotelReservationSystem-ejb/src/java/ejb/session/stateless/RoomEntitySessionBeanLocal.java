@@ -21,4 +21,8 @@ public interface RoomEntitySessionBeanLocal {
 
     public RoomEntity retrieveRoom(long roomId) throws NoResultException;
 
+    public RoomEntity retrieveRoomByName(String roomName) throws NoResultException;
+
+    public RoomEntity updateRoom(RoomEntity room);
+
 }

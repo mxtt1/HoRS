@@ -37,7 +37,16 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         em.flush();
         return newRoom.getId();
     }
-
+    
+    @Override
+    public RoomEntity retrieveRoomByName(String roomName) throws NoResultException{
+        RoomEntity roomEntity = em.createQuery("SELECT e FROM RoomEntity e WHERE e.roomNumber = :roomName", RoomEntity.class)
+             .setParameter("roomName", roomName)
+             .getSingleResult();
+        roomEntity.getReservations().size();
+        return roomEntity;
+    }
+    
     @Override
     public List<RoomEntity> retrieveAllRooms() {
         return em.createQuery("SELECT r FROM RoomEntity r WHERE r.disabled = FALSE", RoomEntity.class).getResultList();
@@ -70,5 +79,11 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         }
     }
     
+    @Override
+    public RoomEntity updateRoom(RoomEntity room) {
+        em.merge(room);
+        em.flush();
+        return room;
+    }
     
 }
