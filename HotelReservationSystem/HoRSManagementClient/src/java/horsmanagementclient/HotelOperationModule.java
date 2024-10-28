@@ -70,6 +70,7 @@ public class HotelOperationModule {
             System.out.println("5. View All Room Types");
             System.out.println("6. Create New Room");
             System.out.println("7. Update Room");
+            System.out.println("8. Delete Room");
             System.out.println("99. Exit");
             response = 0;
 
@@ -90,6 +91,8 @@ public class HotelOperationModule {
                     doCreateNewRoom();
                 } else if (response == 7) {
                     doUpdateRoom();
+                } else if (response == 8) {
+                    doDeleteRoom();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -225,7 +228,7 @@ public class HotelOperationModule {
         RoomTypeEntity roomTypeToBeDeleted = this.doViewRoomTypeDetails();
         
         System.out.print("Enter 'y' to confirm deletion> ");
-        String response = sc.nextLine().trim();
+        String response = sc.nextLine().trim().toLowerCase();
         if (response.equals("y")) {
             roomTypeEntitySessionBeanRemote.deleteRoomType(roomTypeToBeDeleted.getId());
             System.out.println("Room Type " + roomTypeToBeDeleted.getName() + " deleted!");
@@ -300,6 +303,22 @@ public class HotelOperationModule {
             System.in.read();
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doDeleteRoom() {
+        System.out.println("Delete Room: ");
+        System.out.print("Enter Name Of Room to Delete> ");
+        String roomName = sc.nextLine().trim();
+        RoomEntity roomToBeDeleted = roomEntitySessionBeanRemote.retrieveRoomByName(roomName); 
+        long roomToBeDeletedId = roomToBeDeleted.getId();
+        System.out.print("Enter 'y' to confirm deletion> ");
+        String response = sc.next().toLowerCase();
+        if (response.equals("y")) {
+            roomEntitySessionBeanRemote.deleteRoom(roomToBeDeletedId);
+            System.out.println("Room" + roomToBeDeleted.getRoomNumber()+ " deleted!");
+        } else {
+            System.out.println("Deletion cancelled!");
         }
     }
 }
