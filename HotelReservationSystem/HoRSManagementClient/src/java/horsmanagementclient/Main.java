@@ -11,12 +11,16 @@ import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import javax.ejb.EJB;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 
 /**
  *
  * @author mattl
  */
 public class Main {
+
+    @EJB(name = "RoomRateEntitySessionBeanRemote")
+    private static RoomRateEntitySessionBeanRemote roomRateEntitySessionBean;
 
     @EJB(name = "RoomEntitySessionBeanRemote")
     private static RoomEntitySessionBeanRemote roomEntitySessionBean;
@@ -34,7 +38,8 @@ public class Main {
     
     
     public static void main(String[] args) throws InvalidLoginCredentialException, InvalidAccessRightException {
-        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, roomEntitySessionBean);
+        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, 
+                partnerEntitySessionBeanRemote, roomEntitySessionBean, roomRateEntitySessionBean);
         mainApp.runApp();
     }
     

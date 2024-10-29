@@ -1,0 +1,67 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/J2EE/EJB30/StatelessEjbClass.java to edit this template
+ */
+package ejb.session.stateless;
+
+import entities.RoomRateEntity;
+import entities.RoomTypeEntity;
+import java.util.Date;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import util.enums.RateType;
+
+/**
+ *
+ * @author mattl
+ */
+@Stateless
+public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemote, RoomRateEntitySessionBeanLocal {
+
+    @EJB
+    private RoomTypeEntitySessionBeanLocal roomTypeEntitySessionBean;
+
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
+
+    
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
+
+    @Override
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) {
+        RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
+        
+        newRoomRate.setRoomType(roomTypeToBeAssigned);
+        if (newRoomRate.getRateType() == RateType.NORMAL && roomTypeToBeAssigned.getNormalRate() == null) {
+            roomTypeToBeAssigned.setNormalRate(newRoomRate);
+        } else if (newRoomRate.getRateType() == RateType.PUBLISHED && roomTypeToBeAssigned.getPublishedRate() == null) {
+            roomTypeToBeAssigned.setPublishedRate(newRoomRate);       
+        }
+        roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+        
+        
+        em.persist(newRoomRate);
+        em.flush();
+        return newRoomRate.getId();
+    }
+
+    @Override
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) {
+        RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
+
+        newRoomRate.setRoomType(roomTypeToBeAssigned);
+        roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+        
+        newRoomRate.setStartDate(startDate);
+        newRoomRate.setEndDate(endDate);
+
+        em.persist(newRoomRate);
+        em.flush();
+        return newRoomRate.getId();
+    }
+    
+    
+}

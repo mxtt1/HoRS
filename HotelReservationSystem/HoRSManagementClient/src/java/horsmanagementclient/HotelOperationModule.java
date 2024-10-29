@@ -6,11 +6,17 @@ package horsmanagementclient;
 
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
+import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
 import entities.RoomEntity;
+import entities.RoomRateEntity;
 import entities.RoomTypeEntity;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -23,6 +29,7 @@ import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 import util.RankingComparator;
+import util.enums.RateType;
 import util.enums.RoomStatus;
 
 /**
@@ -34,6 +41,7 @@ public class HotelOperationModule {
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
+    private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
 
@@ -46,11 +54,12 @@ public class HotelOperationModule {
     }
 
     public HotelOperationModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, 
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity) {
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote) {
         this();
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
+        this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
     }
 
@@ -59,19 +68,19 @@ public class HotelOperationModule {
             throw new InvalidAccessRightException("You don't have rights to access the hotel operation module.");
         }
 
-        Scanner sc = new Scanner(System.in);
         Integer response = 0;
         while (true) {
             System.out.println("\nHoRS System :: Hotel Operation");
             System.out.println("1. Create New Room Type");
             System.out.println("2. View Room Type Details");
-            System.out.println("3. Update Room Type Details");
+            System.out.println("3. Update Room Type");
             System.out.println("4. Delete Room Type");
             System.out.println("5. View All Room Types");
             System.out.println("6. Create New Room");
             System.out.println("7. Update Room");
             System.out.println("8. Delete Room");
             System.out.println("9. View All Rooms");
+            System.out.println("10. Create New Room Rate");
             System.out.println("99. Exit");
             response = 0;
 
@@ -96,6 +105,8 @@ public class HotelOperationModule {
                     doDeleteRoom();
                 } else if (response == 9) {
                     doViewAllRooms();
+                } else if (response == 10) {
+                    doCreateNewRoomRate();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -330,9 +341,75 @@ public class HotelOperationModule {
         
         for (RoomEntity room : rooms) {
             if (room.isDisabled()) {
-                System.out.println("(DISABLED)");
+                System.out.print("(DISABLED)");
             }
             System.out.println("ID: " + room.getId() + " Name: " + room.getRoomNumber() + " Status: " + room.getRoomStatus().name() + " Type: " + room.getRoomType().getName());
         }
+    }
+
+    private void doCreateNewRoomRate() {
+        sc.nextLine();
+        System.out.println("\nCreate New Room Rate: ");
+        System.out.print("Enter name of room type to create new rate for> ");
+        String roomType = sc.nextLine().trim();
+        
+        System.out.print("Enter name of room rate> ");
+        String roomRateName = sc.nextLine().trim();
+        System.out.print("Enter amount per night> ");
+        BigDecimal ratePerNight = sc.nextBigDecimal();
+        System.out.println();
+                
+        System.out.println("1. Published Rate");
+        System.out.println("2. Normal Rate");
+        System.out.println("3. Peak Rate");
+        System.out.println("4. Promotion Rate");
+        int rateType = 0;
+        while (true) {
+            System.out.print("Select type of rate to create> ");
+            rateType = sc.nextInt();
+            
+            if (rateType == 1 || rateType == 2) {
+                if (rateType == 1) {
+                    RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PUBLISHED, ratePerNight);
+                    roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                } else {
+                    RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.NORMAL, ratePerNight);
+                    roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                }
+                break;
+                
+            } else if (rateType == 3 || rateType == 4) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                dateFormat.setLenient(false);
+                System.out.print("Enter the starting date (dd-MM-yyyy)> ");
+                String inputDate = sc.nextLine().trim();
+                Date startDate = null;
+                try {
+                    startDate = dateFormat.parse(inputDate);
+                } catch (ParseException ex) {
+                    Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.print("Enter the ending date (dd-MM-yyyy)> ");
+                String secondInputDate = sc.nextLine().trim();
+                Date endDate = null;
+                try {
+                    endDate = dateFormat.parse(secondInputDate);
+                } catch (ParseException ex) {
+                    Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                if (rateType == 3) {
+                    RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PEAK, ratePerNight);
+                    roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                } else {
+                    RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PROMOTION, ratePerNight);
+                    roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                }
+                break;
+            } else {
+                System.out.println("Invalid input, try again!");
+            } 
+        }
+        System.out.println("New room rate created successfully!");
     }
 }
