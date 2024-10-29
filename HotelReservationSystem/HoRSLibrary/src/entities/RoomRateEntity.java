@@ -7,6 +7,7 @@ package entities;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import util.enums.RateType;
@@ -48,8 +50,18 @@ public class RoomRateEntity implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
+    
+    @ManyToMany()
+    private List<ReservationEntity> reservations;
 
     public RoomRateEntity() {
+        this.disabled = false;
+    }
+
+    public RoomRateEntity(String name, RateType rateType, BigDecimal ratePerNight) {
+        this.name = name;
+        this.rateType = rateType;
+        this.ratePerNight = ratePerNight;
         this.disabled = false;
     }
     
@@ -134,6 +146,14 @@ public class RoomRateEntity implements Serializable {
 
     public void setRoomType(RoomTypeEntity roomType) {
         this.roomType = roomType;
+    }
+
+    public List<ReservationEntity> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<ReservationEntity> reservations) {
+        this.reservations = reservations;
     }
     
 }

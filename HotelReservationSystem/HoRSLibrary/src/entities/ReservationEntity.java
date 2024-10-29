@@ -6,12 +6,15 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 
@@ -47,6 +50,9 @@ public class ReservationEntity implements Serializable {
     
     @ManyToOne()
     private RoomEntity assignedRoom;
+    
+    @ManyToMany()
+    private List<RoomRateEntity> roomRates;
 
     public Long getId() {
         return id;
@@ -135,6 +141,14 @@ public class ReservationEntity implements Serializable {
 
     public void setAssignedRoom(RoomEntity assignedRoom) {
         this.assignedRoom = assignedRoom;
+    }
+
+    public List<RoomRateEntity> getRoomRates() {
+        return roomRates;
+    }
+
+    public void setRoomRates(List<RoomRateEntity> roomRates) {
+        this.roomRates = roomRates;
     }
     
 }
