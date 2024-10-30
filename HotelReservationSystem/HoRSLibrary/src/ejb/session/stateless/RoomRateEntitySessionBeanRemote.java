@@ -6,7 +6,9 @@ package ejb.session.stateless;
 
 import entities.RoomRateEntity;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Remote;
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -18,5 +20,11 @@ public interface RoomRateEntitySessionBeanRemote {
     public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType);
 
     public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType);
+
+    public RoomRateEntity retrieveRoomRateByName(String roomRateName) throws NoResultException;
+
+    public void deleteRoomRate(long roomRateId);
+
+    public List<RoomRateEntity> retrieveAllRoomRates();
     
 }

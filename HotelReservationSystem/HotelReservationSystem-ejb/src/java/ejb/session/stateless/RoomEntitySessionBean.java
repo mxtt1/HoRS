@@ -7,11 +7,13 @@ package ejb.session.stateless;
 import entities.RoomEntity;
 import entities.RoomTypeEntity;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import util.exception.EntityIsDisabledException;
 
 /**
  *
@@ -28,8 +30,11 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
  
 
     @Override
-    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException{
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException{
         RoomTypeEntity roomType = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomTypeName);
+        if (roomType.isDisabled()) {
+            throw new EntityIsDisabledException("Error: room type is disabled!");
+        }
         roomType.getRooms().add(newRoom);
         newRoom.setRoomType(roomType);
         
@@ -39,9 +44,9 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     }
     
     @Override
-    public RoomEntity retrieveRoomByName(String roomName) throws NoResultException{
-        RoomEntity roomEntity = em.createQuery("SELECT e FROM RoomEntity e WHERE e.roomNumber = :roomName", RoomEntity.class)
-             .setParameter("roomName", roomName)
+    public RoomEntity retrieveRoomByNumber(String roomNum) throws NoResultException{
+        RoomEntity roomEntity = em.createQuery("SELECT e FROM RoomEntity e WHERE e.roomNumber = :roomNum", RoomEntity.class)
+             .setParameter("roomNum", roomNum)
              .getSingleResult();
         roomEntity.getReservations().size();
         return roomEntity;
@@ -49,7 +54,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     
     @Override
     public List<RoomEntity> retrieveAllRooms() {
-        return em.createQuery("SELECT r FROM RoomEntity r WHERE r.disabled = FALSE", RoomEntity.class).getResultList();
+        return em.createQuery("SELECT r FROM RoomEntity r", RoomEntity.class).getResultList();
     } 
     
     @Override
@@ -84,6 +89,19 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         em.merge(room);
         em.flush();
         return room;
+    }
+
+    @Override
+    public RoomEntity changeRoomType(long roomId, String newRoomTypeName) {
+        RoomTypeEntity newRoomType = roomTypeEntitySessionBean.retrieveRoomTypeByName(newRoomTypeName);
+        RoomEntity roomToChangeType = em.find(RoomEntity.class, roomId);
+        
+        roomToChangeType.getRoomType().getRooms().remove(roomToChangeType);
+        roomToChangeType.setRoomType(newRoomType);
+        newRoomType.getRooms().add(roomToChangeType);
+        em.flush();
+        
+        return roomToChangeType;
     }
     
 }

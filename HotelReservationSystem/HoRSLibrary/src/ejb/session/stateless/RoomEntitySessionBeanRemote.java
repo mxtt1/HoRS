@@ -9,6 +9,7 @@ import entities.RoomTypeEntity;
 import java.util.List;
 import javax.ejb.Remote;
 import javax.persistence.NoResultException;
+import util.exception.EntityIsDisabledException;
 
 /**
  *
@@ -17,7 +18,7 @@ import javax.persistence.NoResultException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException;
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException;
 
     public List<RoomEntity> retrieveAllRooms();
 
@@ -25,6 +26,9 @@ public interface RoomEntitySessionBeanRemote {
 
     public void deleteRoom(long roomId);
     
-    public RoomEntity retrieveRoomByName(String roomName) throws NoResultException;
+    public RoomEntity retrieveRoomByNumber(String roomNum) throws NoResultException;
+    
     public RoomEntity updateRoom(RoomEntity room);
+
+    public RoomEntity changeRoomType(long roomId, String newRoomTypeName);
 }
