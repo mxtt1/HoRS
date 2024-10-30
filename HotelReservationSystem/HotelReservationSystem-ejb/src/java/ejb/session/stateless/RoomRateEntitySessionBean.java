@@ -7,9 +7,11 @@ package ejb.session.stateless;
 import entities.RoomRateEntity;
 import entities.RoomTypeEntity;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import util.enums.RateType;
 
@@ -62,6 +64,37 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         em.flush();
         return newRoomRate.getId();
     }
-    
+
+    @Override
+    public RoomRateEntity retrieveRoomRateByName(String roomRateName) throws NoResultException{
+         RoomRateEntity roomRateEntity = em.createQuery("SELECT rr FROM RoomRateEntity rr WHERE rr.name = :roomRateName", RoomRateEntity.class)
+             .setParameter("roomRateName", roomRateName)
+             .getSingleResult();
+
+        return roomRateEntity;
+    }
+
+    @Override
+    public void deleteRoomRate(long roomRateId) {
+        RoomRateEntity roomRateToBeDeleted = em.find(RoomRateEntity.class, roomRateId);
+
+        if (roomRateToBeDeleted.getRoomType().getNormalRate() == roomRateToBeDeleted) {
+            roomRateToBeDeleted.getRoomType().setNormalRate(null);
+        } else if (roomRateToBeDeleted.getRoomType().getPublishedRate() == roomRateToBeDeleted) {
+            roomRateToBeDeleted.getRoomType().setPublishedRate(null);
+        }
+        
+        if (roomRateToBeDeleted.getReservations().isEmpty()) {
+                    roomRateToBeDeleted.getRoomType().getAllRates().remove(roomRateToBeDeleted);
+                    em.remove(roomRateToBeDeleted);
+        } else {
+            roomRateToBeDeleted.setDisabled(true);
+        }
+    }
+
+    @Override
+    public List<RoomRateEntity> retrieveAllRoomRates() {
+        return em.createQuery("SELECT rr FROM RoomRateEntity rr", RoomRateEntity.class).getResultList();
+    }
     
 }
