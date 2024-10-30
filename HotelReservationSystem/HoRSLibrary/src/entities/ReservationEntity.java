@@ -48,7 +48,7 @@ public class ReservationEntity implements Serializable {
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @ManyToOne()
+    @ManyToOne(optional = true)
     private RoomEntity assignedRoom;
     
     @ManyToMany()
