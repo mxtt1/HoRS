@@ -41,7 +41,7 @@ public class ReservationEntity implements Serializable {
     @ManyToOne()
     private EmployeeEntity employee;
     
-    @ManyToOne()
+    @ManyToOne(optional = true)
     private GuestEntity guest;
     
     @ManyToOne(optional = false)
