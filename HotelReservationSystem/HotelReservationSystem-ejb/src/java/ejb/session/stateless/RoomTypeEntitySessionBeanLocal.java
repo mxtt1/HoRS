@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entities.RoomTypeEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -24,5 +25,10 @@ public interface RoomTypeEntitySessionBeanLocal {
     public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName);
 
     public RoomTypeEntity updateRoomType(RoomTypeEntity roomType);
+
+    public List<RoomTypeEntity> getAvailableRoomTypes(Date startDate, Date endDate);
+
+    
+    public int getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate);
     
 }

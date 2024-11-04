@@ -4,7 +4,11 @@
  */
 package ejb.session.stateless;
 
+import entities.ReservationEntity;
+import entities.RoomRateEntity;
 import entities.RoomTypeEntity;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -21,10 +25,88 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-
-    
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+    @Override
+    public List<RoomTypeEntity> getAvailableRoomTypes(Date startDate, Date endDate) {
+        List<RoomTypeEntity> availableRoomTypes = new ArrayList<>();
+        List<RoomTypeEntity> roomTypes = em.createQuery("SELECT rt FROM RoomTypeEntity rt", RoomTypeEntity.class).getResultList();
+
+        for (RoomTypeEntity roomType : roomTypes) {
+            int totalRooms = roomType.getRooms().size();
+            int bookedRooms = 0;
+            roomType.getAllRates().size();
+
+            List<ReservationEntity> reservations = roomType.getReservations();
+            for (ReservationEntity reservation : reservations) {
+                if (startDate.before(reservation.getEndDate()) && endDate.after(reservation.getStartDate())) {
+                    bookedRooms++;
+                }
+            }
+
+            if (bookedRooms < totalRooms) {
+                availableRoomTypes.add(roomType);
+            }
+        }
+        return availableRoomTypes;
+    }
+
+    @Override
+    public int getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate) {
+        int totalCost = 0;
+        Date currentDate = startDate;
+
+   
+        while (!currentDate.after(endDate)) {
+            RoomRateEntity applicableRate = null;
+
+        
+            for (RoomRateEntity rate : roomType.getAllRates()) {
+                Date rateStartDate = rate.getStartDate();
+                Date rateEndDate = rate.getEndDate();
+                String rateType = rate.getRateType().name();
+
+                if (rateType.equals("PUBLISHED") || (rateStartDate != null && rateEndDate != null
+                        && !currentDate.before(rateStartDate) && !currentDate.after(rateEndDate))) {
+
+                    if (applicableRate == null || isHigherPriority(rate, applicableRate)) {
+                        applicableRate = rate;
+                    }
+                }
+            }
+
+            if (applicableRate != null) {
+                totalCost += applicableRate.getRatePerNight().intValue();
+            }
+
+            // Move to the next day
+            currentDate = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24)); 
+        }
+
+        return totalCost;
+    }
+
+    private boolean isHigherPriority(RoomRateEntity newRate, RoomRateEntity existingRate) {
+        int newPriority = getPriority(newRate.getRateType().name());
+        int existingPriority = getPriority(existingRate.getRateType().name());
+        return newPriority < existingPriority; // Lower number indicates higher priority
+    }
+
+    private int getPriority(String rateType) {
+        switch (rateType) {
+            case "PROMOTION":
+                return 1; // Highest priority
+            case "PEAK":
+                return 2;
+            case "PUBLISHED":
+                return 3;
+            case "NORMAL":
+                return 4; // Lowest priority
+
+            default:
+                return Integer.MAX_VALUE;
+        }
+    }
 
     @Override
     public long createNewRoomType(RoomTypeEntity newRoomType) {
@@ -36,7 +118,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     @Override
     public List<RoomTypeEntity> retrieveAllRoomTypes() {
         return em.createQuery("SELECT rt FROM RoomTypeEntity rt", RoomTypeEntity.class).getResultList();
-    } 
+    }
 
     @Override
     public void setRoomTypeRanking(int ranking, long roomId) {
@@ -54,16 +136,16 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName) throws NoResultException{
+    public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName) throws NoResultException {
         RoomTypeEntity roomType = em.createQuery("SELECT e FROM RoomTypeEntity e WHERE e.name = :roomName", RoomTypeEntity.class)
-             .setParameter("roomName", roomTypeName)
-             .getSingleResult();
+                .setParameter("roomName", roomTypeName)
+                .getSingleResult();
         roomType.getRooms().size();
         return roomType;
     }
 
     @Override
-    public void deleteRoomType(long roomTypeId) throws NoResultException{
+    public void deleteRoomType(long roomTypeId) throws NoResultException {
         RoomTypeEntity roomTypeToDelete = em.find(RoomTypeEntity.class, roomTypeId);
         List<RoomTypeEntity> roomTypes = this.retrieveAllRoomTypes();
 
@@ -73,21 +155,20 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
                 rt.setRanking(currentRank - 1);
             }
         }
-        
+
         if (!roomTypeToDelete.getRooms().isEmpty() || !roomTypeToDelete.getAllRates().isEmpty() || !roomTypeToDelete.getReservations().isEmpty()) {
             roomTypeToDelete.setDisabled(true);
         } else {
             em.remove(roomTypeToDelete);
         }
-        
+
     }
-    
+
     @Override
     public RoomTypeEntity updateRoomType(RoomTypeEntity roomType) {
         em.merge(roomType);
         em.flush();
         return roomType;
     }
-    
-    
+
 }

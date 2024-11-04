@@ -10,7 +10,15 @@ import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.GuestEntity;
+import entities.RoomTypeEntity;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -47,7 +55,8 @@ public class MainApp {
             System.out.println("\nWelcome to HoRS Reservation Client");
             System.out.println("1: Guest Login");
             System.out.println("2: Register As Guest");
-            System.out.println("3: Exit");
+            System.out.println("3: Search Hotel Room");
+            System.out.println("4: Exit");
             response = 0;
 
             while (response < 1 || response > 99) {
@@ -65,12 +74,14 @@ public class MainApp {
                 } else if (response == 2) {
                     doRegisterAsGuest();
                 } else if (response == 3) {
+                    doSearchHotelRoom();
+                } else if (response == 4) {
                     break;
                 } else {
                     System.out.println("Invalid input, try again!");
                 }
             }
-            if (response == 3) {
+            if (response == 4) {
                 break;
             }
         }
@@ -119,6 +130,56 @@ public class MainApp {
         long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
         System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
         runApp();
+    }
+
+    private void doSearchHotelRoom() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM dd");
+        
+        Date startDate = null;
+        Date endDate = null;
+        
+        while (startDate == null) {
+            System.out.print("Enter start date (format: yyyy MM dd, e.g., 2002 10 12): ");
+            String startInput = sc.nextLine();
+            try {
+                startDate = dateFormat.parse(startInput);
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use yyyy MM dd.");
+            }
+        }
+
+        while (endDate == null || endDate.before(startDate)) {
+            System.out.print("Enter end date (format: yyyy MM dd, e.g., 2002 10 12): ");
+            String endInput = sc.nextLine();
+            try {
+                endDate = dateFormat.parse(endInput);
+                if (endDate.before(startDate)) {
+                    System.out.println("End date must be after the start date.");
+                }
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use yyyy MM dd.");
+            }
+        }
+        
+        List<RoomTypeEntity> availableRoomTypes = roomTypeEntitySessionBeanRemote.getAvailableRoomTypes(startDate, endDate);
+        if (availableRoomTypes.isEmpty()) {
+            System.out.println("No rooms available for the selected date range.");
+        } else {
+            System.out.println("Available Room Types:");
+            for (RoomTypeEntity roomType : availableRoomTypes) {
+                System.out.println(roomType.getName());
+                int cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
+                System.out.println("Price: $" + cost);
+                
+            }
+        }
+        
+        System.out.print("\nPress any key to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

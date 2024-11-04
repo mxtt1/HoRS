@@ -31,11 +31,14 @@ public class RoomEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @Column(length = 4, nullable = false, unique = true)
     private String roomNumber;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoomStatus roomStatus;
+    
     @Column(nullable = false)
     private boolean disabled;
     
