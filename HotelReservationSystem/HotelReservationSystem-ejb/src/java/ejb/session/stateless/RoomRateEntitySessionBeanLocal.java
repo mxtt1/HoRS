@@ -5,6 +5,8 @@
 package ejb.session.stateless;
 
 import entities.RoomRateEntity;
+import entities.RoomTypeEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -18,5 +20,9 @@ public interface RoomRateEntitySessionBeanLocal {
     void deleteRoomRate(long roomRateId);
 
     public List<RoomRateEntity> retrieveAllRoomRates();
+
+    public List<RoomRateEntity> retrieveApplicablePromoRates(RoomTypeEntity roomType, Date date);
+
+    public List<RoomRateEntity> retrieveApplicablePeakRates(RoomTypeEntity roomType, Date date);
     
 }

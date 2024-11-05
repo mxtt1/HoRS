@@ -7,9 +7,11 @@ package ejb.session.stateless;
 import entities.ReservationEntity;
 import entities.RoomRateEntity;
 import entities.RoomTypeEntity;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -22,18 +24,26 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemote, RoomTypeEntitySessionBeanLocal {
 
+    @EJB
+    private RoomRateEntitySessionBeanLocal roomRateEntitySessionBean;
+
+    @EJB
+    private RoomEntitySessionBeanLocal roomEntitySessionBean;
+   
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
+    
+    
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     @Override
     public List<RoomTypeEntity> getAvailableRoomTypes(Date startDate, Date endDate) {
         List<RoomTypeEntity> availableRoomTypes = new ArrayList<>();
-        List<RoomTypeEntity> roomTypes = em.createQuery("SELECT rt FROM RoomTypeEntity rt", RoomTypeEntity.class).getResultList();
+        List<RoomTypeEntity> roomTypes = this.retrieveActiveRoomTypes();
 
         for (RoomTypeEntity roomType : roomTypes) {
-            int totalRooms = roomType.getRooms().size();
+            int totalRooms = roomEntitySessionBean.retrieveActiveRoomsForType(roomType).size();
             int bookedRooms = 0;
             roomType.getAllRates().size();
 
@@ -52,31 +62,26 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public int getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate) {
-        int totalCost = 0;
+    public BigDecimal getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate) {
+        BigDecimal totalCost = BigDecimal.ZERO;
         Date currentDate = startDate;
 
    
         while (!currentDate.after(endDate)) {
             RoomRateEntity applicableRate = null;
-
-        
-            for (RoomRateEntity rate : roomType.getAllRates()) {
-                Date rateStartDate = rate.getStartDate();
-                Date rateEndDate = rate.getEndDate();
-                String rateType = rate.getRateType().name();
-
-                if (rateType.equals("PUBLISHED") || (rateStartDate != null && rateEndDate != null
-                        && !currentDate.before(rateStartDate) && !currentDate.after(rateEndDate))) {
-
-                    if (applicableRate == null || isHigherPriority(rate, applicableRate)) {
-                        applicableRate = rate;
-                    }
-                }
+            List<RoomRateEntity> promoRates = roomRateEntitySessionBean.retrieveApplicablePromoRates(roomType, currentDate);
+            List<RoomRateEntity> peakRates = roomRateEntitySessionBean.retrieveApplicablePeakRates(roomType, currentDate);
+            
+            if (!promoRates.isEmpty()) {
+                applicableRate = promoRates.get(0);
+            } else if (!peakRates.isEmpty()) {
+                applicableRate = peakRates.get(0);
+            } else {
+                applicableRate = roomType.getNormalRate();
             }
-
+            
             if (applicableRate != null) {
-                totalCost += applicableRate.getRatePerNight().intValue();
+                totalCost = totalCost.add(applicableRate.getRatePerNight());
             }
 
             // Move to the next day
@@ -84,28 +89,6 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         }
 
         return totalCost;
-    }
-
-    private boolean isHigherPriority(RoomRateEntity newRate, RoomRateEntity existingRate) {
-        int newPriority = getPriority(newRate.getRateType().name());
-        int existingPriority = getPriority(existingRate.getRateType().name());
-        return newPriority < existingPriority; // Lower number indicates higher priority
-    }
-
-    private int getPriority(String rateType) {
-        switch (rateType) {
-            case "PROMOTION":
-                return 1; // Highest priority
-            case "PEAK":
-                return 2;
-            case "PUBLISHED":
-                return 3;
-            case "NORMAL":
-                return 4; // Lowest priority
-
-            default:
-                return Integer.MAX_VALUE;
-        }
     }
 
     @Override
@@ -118,6 +101,11 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     @Override
     public List<RoomTypeEntity> retrieveAllRoomTypes() {
         return em.createQuery("SELECT rt FROM RoomTypeEntity rt", RoomTypeEntity.class).getResultList();
+    }
+    
+    @Override
+    public List<RoomTypeEntity> retrieveActiveRoomTypes() {
+        return em.createNamedQuery("findActiveRoomTypes").getResultList();
     }
 
     @Override
@@ -170,5 +158,6 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         em.flush();
         return roomType;
     }
+
 
 }

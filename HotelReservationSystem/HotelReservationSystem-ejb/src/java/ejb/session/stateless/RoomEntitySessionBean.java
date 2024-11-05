@@ -58,6 +58,14 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     } 
     
     @Override
+    public List<RoomEntity> retrieveActiveRoomsForType(RoomTypeEntity roomType) {
+        return em.createNamedQuery("findActiveRoomsForRoomType")
+                .setParameter("roomType", roomType)
+                .getResultList();
+    }
+    
+    
+    @Override
     public RoomEntity retrieveRoom(long roomId) throws NoResultException{
         return em.find(RoomEntity.class, roomId);
     }
@@ -103,5 +111,5 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         
         return roomToChangeType;
     }
-    
+
 }

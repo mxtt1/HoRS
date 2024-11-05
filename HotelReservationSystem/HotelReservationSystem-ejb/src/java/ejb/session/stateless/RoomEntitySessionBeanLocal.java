@@ -27,4 +27,6 @@ public interface RoomEntitySessionBeanLocal {
 
     public RoomEntity changeRoomType(long roomId, String newRoomTypeName);
 
+    List<RoomEntity> retrieveActiveRoomsForType(RoomTypeEntity roomType);
+
 }
