@@ -7,7 +7,6 @@ package ejb.session.stateless;
 import entities.RoomEntity;
 import entities.RoomTypeEntity;
 import java.util.List;
-import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -48,7 +47,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         RoomEntity roomEntity = em.createQuery("SELECT e FROM RoomEntity e WHERE e.roomNumber = :roomNum", RoomEntity.class)
              .setParameter("roomNum", roomNum)
              .getSingleResult();
-        roomEntity.getReservations().size();
+        //roomEntity.getReservations().size();
         return roomEntity;
     }
     
@@ -73,9 +72,9 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     @Override
     public RoomEntity retrieveRoom(long roomId, boolean loadReservations) throws NoResultException{
         RoomEntity retrievedRoom = this.retrieveRoom(roomId);
-        if (loadReservations) {
+        /*if (loadReservations) {
             retrievedRoom.getReservations().size();
-        }
+        }*/
 
         return retrievedRoom;
     }

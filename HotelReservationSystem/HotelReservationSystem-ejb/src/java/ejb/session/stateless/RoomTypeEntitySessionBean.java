@@ -43,18 +43,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         List<RoomTypeEntity> roomTypes = this.retrieveActiveRoomTypes();
 
         for (RoomTypeEntity roomType : roomTypes) {
-            int totalRooms = roomEntitySessionBean.retrieveActiveRoomsForType(roomType).size();
-            int bookedRooms = 0;
-            roomType.getAllRates().size();
-
-            List<ReservationEntity> reservations = roomType.getReservations();
-            for (ReservationEntity reservation : reservations) {
-                if (startDate.before(reservation.getEndDate()) && endDate.after(reservation.getStartDate())) {
-                    bookedRooms++;
-                }
-            }
-
-            if (bookedRooms < totalRooms) {
+            if (this.getAvailableRoomQuantity(startDate, endDate, roomType) > 0) {
                 availableRoomTypes.add(roomType);
             }
         }
@@ -157,6 +146,21 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         em.merge(roomType);
         em.flush();
         return roomType;
+    }
+
+    @Override
+    public int getAvailableRoomQuantity(Date startDate, Date endDate, RoomTypeEntity roomType) {
+        int totalRooms = roomEntitySessionBean.retrieveActiveRoomsForType(roomType).size();
+        int bookedRooms = 0;
+        roomType.getAllRates().size();
+
+        List<ReservationEntity> reservations = roomType.getReservations();
+        for (ReservationEntity reservation : reservations) {
+            if (startDate.before(reservation.getEndDate()) && endDate.after(reservation.getStartDate())) {
+                bookedRooms += reservation.getQuantity();
+            }
+        }
+        return Math.max(totalRooms - bookedRooms, 0);
     }
 
 
