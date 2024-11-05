@@ -18,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import util.enums.RateType;
 
@@ -26,6 +28,12 @@ import util.enums.RateType;
  * @author mattl
  */
 @Entity
+@NamedQueries ({
+    @NamedQuery(name = "findApplicablePromoRates", query = "SELECT rr FROM RoomRateEntity "
+            + "WHERE rr.disabled = FALSE AND rr.roomType = :roomType AND rr.rateType = 'PROMOTION' AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate"),
+    @NamedQuery(name = "findApplicablePeakRates", query = "SELECT rr FROM RoomRateEntity "
+            + "WHERE rr.disabled = FALSE AND rr.roomType = :roomType AND rr.rateType = 'PEAK' AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate")
+})
 public class RoomRateEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -16,6 +16,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import util.enums.RoomStatus;
@@ -25,6 +28,9 @@ import util.enums.RoomStatus;
  * @author mattl
  */
 @Entity
+@NamedQueries ({
+    @NamedQuery(name = "findActiveRoomsForRoomType", query = "SELECT r FROM RoomEntity r WHERE r.disabled = FALSE AND r.roomType = :roomType")
+})
 public class RoomEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
