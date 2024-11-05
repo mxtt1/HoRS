@@ -12,6 +12,7 @@ import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.GuestEntity;
 import entities.RoomTypeEntity;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -168,7 +169,7 @@ public class MainApp {
             System.out.println("Available Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
                 System.out.println(roomType.getName());
-                int cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
+                BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.println("Price: $" + cost);
                 
             }
