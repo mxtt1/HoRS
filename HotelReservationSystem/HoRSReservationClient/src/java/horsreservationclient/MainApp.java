@@ -124,6 +124,25 @@ public class MainApp {
         username = sc.nextLine().trim();
         System.out.print("Enter password> ");
         password = sc.nextLine().trim();
+        /*
+        System.out.println("Choose one to input: ");
+        System.out.println("1. Passport number");
+        System.out.println("2. Email");
+        System.out.println("3. Mobile phone number");
+        int input = sc.nextInt();
+        if (input == 1) {
+            System.out.print("Enter passport number> ");
+            passportNum = sc.nextLine().trim();
+        } else if (input == 2) {
+            System.out.print("Enter email> ");
+            email = sc.nextLine().trim();
+        } else if (input == 3) {
+            System.out.print("Enter phone number> ");
+            phoneNum = sc.nextLine().trim();
+        } else {
+            System.out.println("Invalid input!");
+        }
+        */
         System.out.print("Enter passport number> ");
         passportNum = sc.nextLine().trim();
         
@@ -170,7 +189,6 @@ public class MainApp {
             for (RoomTypeEntity roomType : availableRoomTypes) {
                 System.out.print("ID: " + roomType.getId());
                 System.out.print(" Name: " + roomType.getName());
-                System.out.print(roomType.getName());
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.print(" Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);

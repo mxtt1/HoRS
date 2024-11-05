@@ -155,6 +155,7 @@ public class SystemAdminModule {
     }
 
     private void doCreateNewPartner() throws InvalidLoginCredentialException {
+        sc.nextLine();
         String username;
         String password;                
         System.out.println("\nCreate New Partner Account: ");
@@ -176,7 +177,7 @@ public class SystemAdminModule {
         System.out.println("\nViewing All Partner Records:\n");
         List<PartnerEntity> partners = partnerEntitySessionBeanRemote.retrieveAllPartners();
         for (PartnerEntity p : partners) {
-            System.out.println("ID: " + p.getPartnerEntityId()+ "Username: " + p.getUsername());
+            System.out.println("ID: " + p.getPartnerEntityId()+ " Username: " + p.getUsername());
         }
         System.out.print("\nPress any key to continue.");
         try {

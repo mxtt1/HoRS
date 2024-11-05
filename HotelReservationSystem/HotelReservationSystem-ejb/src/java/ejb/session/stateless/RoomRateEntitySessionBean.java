@@ -111,6 +111,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         return em.createNamedQuery("findApplicablePromoRates", RoomRateEntity.class)
                 .setParameter("roomType", roomType)
                 .setParameter("givenDate", date)
+                .setParameter("promotionRate", RateType.PROMOTION)
                 .getResultList();
     }
 
@@ -119,6 +120,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         return em.createNamedQuery("findApplicablePeakRates", RoomRateEntity.class)
                 .setParameter("roomType", roomType)
                 .setParameter("givenDate", date)
+                .setParameter("peakRate", RateType.PEAK)
                 .getResultList();
     }
     

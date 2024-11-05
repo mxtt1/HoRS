@@ -115,8 +115,13 @@ class GuestModule {
         } else {
             System.out.println("Available Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("ID: " + roomType.getId());
                 System.out.print(" Name: " + roomType.getName());
+                System.out.println("Room Name: " + roomType.getName());
+                System.out.println("Room Description: " + roomType.getDescription());
+                System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
+                System.out.println("Bed: " + roomType.getBedType());
+                System.out.println("Capacity: " + roomType.getCapacity());
+                System.out.println("Amenities: " + roomType.getAmenities());
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.print(" Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);

@@ -30,9 +30,9 @@ import util.enums.RateType;
 @Entity
 @NamedQueries ({
     @NamedQuery(name = "findApplicablePromoRates", query = "SELECT rr FROM RoomRateEntity rr "
-            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = 'PROMOTION' AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate"),
+            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = :promotionRate AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate"),
     @NamedQuery(name = "findApplicablePeakRates", query = "SELECT rr FROM RoomRateEntity rr "
-            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = 'PEAK' AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate")
+            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = :peakRate AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate")
 })
 public class RoomRateEntity implements Serializable {
 

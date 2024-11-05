@@ -251,7 +251,7 @@ public class HotelOperationModule {
 
     private void doDeleteRoomTypeRecord() {
         RoomTypeEntity roomTypeToBeDeleted = this.doViewRoomTypeDetails();
-        
+        sc.nextLine();
         System.out.print("Enter 'y' to confirm deletion> ");
         String response = sc.nextLine().trim().toLowerCase();
         if (response.equals("y")) {
@@ -269,7 +269,7 @@ public class HotelOperationModule {
         
         for (RoomTypeEntity rt : roomTypes) {
             if (rt.isDisabled()) System.out.print("(DISABLED) ");
-            System.out.println("ID: " + rt.getId() + " Name: " + rt.getName() + " Ranking: " + rt.getRanking());
+            System.out.println("ID: " + rt.getId() + " | Name: " + rt.getName() + " | Ranking: " + rt.getRanking());
         }
         
         System.out.println("\nPress any key to continue.");
@@ -352,7 +352,7 @@ public class HotelOperationModule {
     private void doDeleteRoom() {
         sc.nextLine();
         System.out.println("Delete Room: ");
-        System.out.print("Enter Number Of Room to Delete> ");
+        System.out.print("Enter Number Of Room to Delete (eg. 1234) > ");
         String roomNum = sc.nextLine().trim();
         RoomEntity roomToBeDeleted = roomEntitySessionBeanRemote.retrieveRoomByNumber(roomNum); 
         long roomToBeDeletedId = roomToBeDeleted.getId();
@@ -374,7 +374,7 @@ public class HotelOperationModule {
             if (room.isDisabled()) {
                 System.out.print("(DISABLED)");
             }
-            System.out.println("ID: " + room.getId() + " Number: " + room.getRoomNumber() + " Status: " + room.getRoomStatus().name() + " Type: " + room.getRoomType().getName());
+            System.out.println("ID: " + room.getId() + " | Number: " + room.getRoomNumber() + " | Status: " + room.getRoomStatus().name() + " | Type: " + room.getRoomType().getName());
         }
         
         System.out.println("Press any key to continue.");
@@ -479,7 +479,7 @@ public class HotelOperationModule {
 
     private void doDeleteRoomRateRecord() {
         RoomRateEntity roomRateToBeDeleted = this.doViewRoomRateDetails();
-        
+        sc.nextLine();
         System.out.print("Enter 'y' to confirm deletion> ");
         String response = sc.nextLine().trim().toLowerCase();
         if (response.equals("y")) {
@@ -496,8 +496,13 @@ public class HotelOperationModule {
         
         for (RoomRateEntity rr : roomRates) {
             if (rr.isDisabled()) System.out.print("(DISABLED) ");
-            System.out.println("ID: " + rr.getId() + " Name: " + rr.getName() + " Room Type: " + rr.getRoomType().getName()
-                    + " Rate Type: " + rr.getRateType());
+            String output = "ID: " + rr.getId() + " | Name: " + rr.getName() + " | Room Type: " + rr.getRoomType().getName()
+                    + " | Rate Type: " + rr.getRateType();
+            if (rr.getRateType().toString().equals("PEAK") || rr.getRateType().toString().equals("PROMOTION")) {
+                output += (" | Start Date: " + rr.getStartDate().toString() + " | End Date: " + rr.getEndDate().toString());
+            }
+            System.out.println(output);
+            
         }
         
         System.out.println("\nPress any key to continue.");
