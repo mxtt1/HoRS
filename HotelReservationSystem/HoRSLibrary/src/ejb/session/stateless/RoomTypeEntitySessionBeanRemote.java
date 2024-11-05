@@ -33,4 +33,6 @@ public interface RoomTypeEntitySessionBeanRemote {
 
     public BigDecimal getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate);
 
+    int getAvailableRoomQuantity(Date startDate, Date endDate, RoomTypeEntity roomType);
+
 }

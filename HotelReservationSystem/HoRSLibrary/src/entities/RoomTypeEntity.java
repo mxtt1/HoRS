@@ -47,13 +47,13 @@ public class RoomTypeEntity implements Serializable {
     @Column(nullable = false)
     private boolean disabled;
     
-    @OneToMany(mappedBy = "roomType", orphanRemoval = true)
+    @OneToMany(mappedBy = "roomType")
     private List<RoomRateEntity> allRates;
     
-    @OneToOne(orphanRemoval = true)   
+    @OneToOne()   
     private RoomRateEntity normalRate;
     
-    @OneToOne(orphanRemoval = true)
+    @OneToOne()
     private RoomRateEntity publishedRate;
     
     @OneToMany (mappedBy = "roomType")
