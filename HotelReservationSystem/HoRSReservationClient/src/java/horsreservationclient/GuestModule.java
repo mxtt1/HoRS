@@ -85,9 +85,12 @@ class GuestModule {
                 break;
             }
         }
+        sc.close();
     }
 
     private void doSearchHotelRoom() {
+        Scanner sc = new Scanner(System.in);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
 
@@ -142,9 +145,12 @@ class GuestModule {
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
+        sc.close();
     }
 
     private void doSearchHotelRoom(Date sd, Date ed) {
+        Scanner sc = new Scanner(System.in);
+
         Date startDate = sd;
         Date endDate = ed;
         List<RoomTypeEntity> availableRoomTypes = roomTypeEntitySessionBeanRemote.getAvailableRoomTypes(startDate, endDate);
@@ -172,9 +178,12 @@ class GuestModule {
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
+        sc.close();
     }
 
     private void doReserveHotelRoom() {
+        Scanner sc = new Scanner(System.in);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
 
@@ -232,11 +241,12 @@ class GuestModule {
             if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
                 // ALLOCATE ROOM
             }
-            
+
             System.out.println("Reservation Successful!");
 
         } catch (NoResultException e) {
             System.out.println(e.getMessage());
         }
+        sc.close();
     }
 }

@@ -23,6 +23,7 @@ import util.exception.InvalidLoginCredentialException;
  * @author Mark
  */
 public class MainApp {
+
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
@@ -32,22 +33,20 @@ public class MainApp {
     private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
 
-    
     private SystemAdminModule systemAdminModule;
     private HotelOperationModule hotelOperationModule;
     private GuestRelationModule guestRelationModule;
-    
+
     private EmployeeEntity currentEmployeeEntity;
-    
+
     private final Scanner sc = new Scanner(System.in);
-    
-    
+
     public MainApp() {
-        
+
     }
-    
-    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, 
-            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, 
+
+    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
+            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote,
             RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, GuestEntitySessionBeanRemote guestEntitySessionBeanRemote,
             UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
@@ -59,12 +58,13 @@ public class MainApp {
         this.unregisteredGuestEntitySessionBeanRemote = unregisteredGuestEntitySessionBeanRemote;
         this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
     }
-    
+
     public void runApp() throws InvalidLoginCredentialException, InvalidAccessRightException {
         Scanner sc = new Scanner(System.in);
         Integer response = 0;
-        
+
         while (true) {
+
             System.out.println("\nWelcome to HoRS Management Client");
             System.out.println("1: Login");
             System.out.println("2: Exit");
@@ -81,7 +81,7 @@ public class MainApp {
                         hotelOperationModule = new HotelOperationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
                                 roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote);
                         guestRelationModule = new GuestRelationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
-                                roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote, guestEntitySessionBeanRemote, 
+                                roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote, guestEntitySessionBeanRemote,
                                 unregisteredGuestEntitySessionBeanRemote, reservationEntitySessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
@@ -93,28 +93,31 @@ public class MainApp {
                     System.out.println("Invalid input, try again!");
                 }
             }
-            if (response == 2) break;
+            if (response == 2) {
+                break;
+            }
         }
+        sc.close();
     }
 
     private void doLogin() throws InvalidLoginCredentialException {
+        Scanner sc = new Scanner(System.in);
+
         String username = "";
         String password = "";
-        
+
         System.out.println("Login: ");
         System.out.print("Enter username> ");
         username = sc.nextLine().trim();
         System.out.print("Enter password> ");
         password = sc.nextLine().trim();
-        
-        if(username.length() > 0 && password.length() > 0)
-        {
-            currentEmployeeEntity = employeeEntitySessionBeanRemote.employeeLogin(username, password);      
-        }
-        else
-        {
+
+        if (username.length() > 0 && password.length() > 0) {
+            currentEmployeeEntity = employeeEntitySessionBeanRemote.employeeLogin(username, password);
+        } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
+        sc.close();
     }
 
     private void menuMain() throws InvalidAccessRightException {
@@ -163,5 +166,6 @@ public class MainApp {
                 break;
             }
         }
+        sc.close();
     }
 }

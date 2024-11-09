@@ -53,7 +53,7 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     
     @Override
     public List<GuestEntity> retrieveGuestByPassportNo(String passportNo) {
-        List<GuestEntity> guests = em.createQuery("SELECT e FROM GuestEntity e WHERE e.passportNum = :passportNo", GuestEntity.class)
+        List<GuestEntity> guests = em.createQuery("SELECT e FROM UnregisteredGuestEntity e WHERE e.passportNum = :passportNo", GuestEntity.class)
              .setParameter("passportNo", passportNo).getResultList();
           
         return guests;

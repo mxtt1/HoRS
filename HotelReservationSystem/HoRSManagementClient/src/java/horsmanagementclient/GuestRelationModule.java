@@ -45,8 +45,6 @@ class GuestRelationModule {
 
     private EmployeeEntity currentEmployeeEntity;
 
-    private final Scanner sc = new Scanner(System.in);
-
     public GuestRelationModule() {
 
     }
@@ -67,6 +65,7 @@ class GuestRelationModule {
     }
 
     void menuGuestRelation() throws InvalidAccessRightException {
+        Scanner sc = new Scanner(System.in);
         if (currentEmployeeEntity.getEmployeeRole() != EmployeeRole.GRO) {
             throw new InvalidAccessRightException("You don't have rights to access the guest relation module.");
         }
@@ -86,10 +85,13 @@ class GuestRelationModule {
                 System.out.print("> ");
                 response = sc.nextInt();
                 if (response == 1) {
+                    sc.close();
                     doWalkInSearchRoom();
                 } else if (response == 2) {
+                    sc.close();
                     doReserveHotelRoom();
                 } else if (response == 3) {
+                    sc.close();
                     doCheckInGuest();
                 } else if (response == 4) {
 
@@ -106,6 +108,8 @@ class GuestRelationModule {
     }
 
     private void doWalkInSearchRoom() {
+        Scanner sc = new Scanner(System.in);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
 
@@ -157,12 +161,15 @@ class GuestRelationModule {
         System.out.print("\nPress any key to continue.");
         try {
             System.in.read();
+            sc.close();
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void doWalkInSearchRoom(Date sd, Date ed) {
+        Scanner sc = new Scanner(System.in);
+
         Date startDate = sd;
         Date endDate = ed;
 
@@ -188,6 +195,7 @@ class GuestRelationModule {
         System.out.print("\nPress any key to continue.");
         try {
             System.in.read();
+            sc.close();
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -198,6 +206,7 @@ class GuestRelationModule {
     }
 
     private void doReserveHotelRoom() {
+        Scanner sc = new Scanner(System.in);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
@@ -265,9 +274,9 @@ class GuestRelationModule {
             if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
                 // ALLOCATE ROOM
             }
-            
-            System.out.println("Reservation Successful!");
 
+            System.out.println("Reservation Successful!");
+            sc.close();
         } catch (NoResultException e) {
             System.out.println(e.getMessage());
         }

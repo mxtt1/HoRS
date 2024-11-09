@@ -42,7 +42,7 @@ public class MainApp {
     private GuestEntity currentGuestEntity;
     
     private GuestModule guestModule;
-    private final Scanner sc = new Scanner(System.in);
+    
 
     public MainApp(GuestEntitySessionBeanRemote guestEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote,
             RoomEntitySessionBeanRemote roomEntitySessionBean, RoomRateEntitySessionBeanRemote roomRateEntitySessionBean, 
@@ -94,9 +94,12 @@ public class MainApp {
                 break;
             }
         }
+        sc.close();
     }
     
     private void doLogin() throws InvalidLoginCredentialException {
+                Scanner sc = new Scanner(System.in);
+
         String username = "";
         String password = "";
         
@@ -114,9 +117,12 @@ public class MainApp {
         {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
+        sc.close();
     }
 
     private void doRegisterAsGuest() throws InvalidAccessRightException {
+                Scanner sc = new Scanner(System.in);
+
         String username = "";
         String password = "";
         String email = "";
@@ -153,9 +159,12 @@ public class MainApp {
         GuestEntity newGuest = new GuestEntity(username, passportNum, password);
         long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
         System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
+        sc.close();
     }
 
     private void doSearchHotelRoom() {
+                Scanner sc = new Scanner(System.in);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
         
@@ -210,6 +219,7 @@ public class MainApp {
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
+        sc.close();
     }
 
 }
