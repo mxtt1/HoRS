@@ -66,7 +66,8 @@ public class HotelOperationModule {
     }
 
     public void menuHotelOperation() throws InvalidAccessRightException {
-        if (currentEmployeeEntity.getEmployeeRole() == EmployeeRole.GRO) {
+        if (currentEmployeeEntity.getEmployeeRole() != EmployeeRole.OPS_MANAGER && 
+                currentEmployeeEntity.getEmployeeRole() != EmployeeRole.SALES_MANAGER) {
             throw new InvalidAccessRightException("You don't have rights to access the hotel operation module.");
         }
 

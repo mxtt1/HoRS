@@ -5,19 +5,31 @@
 package horsmanagementclient;
 
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
+import ejb.session.stateless.GuestEntitySessionBeanRemote;
 import ejb.session.stateless.PartnerEntitySessionBeanRemote;
+import ejb.session.stateless.ReservationEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import javax.ejb.EJB;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
+import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 
 /**
  *
  * @author mattl
  */
 public class Main {
+
+    @EJB(name = "ReservationEntitySessionBeanRemote")
+    private static ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
+
+    @EJB(name = "UnregisteredGuestEntitySessionBeanRemote")
+    private static UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
+
+    @EJB(name = "GuestEntitySessionBeanRemote")
+    private static GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
 
     @EJB(name = "RoomRateEntitySessionBeanRemote")
     private static RoomRateEntitySessionBeanRemote roomRateEntitySessionBean;
@@ -33,14 +45,12 @@ public class Main {
 
     @EJB(name = "RoomTypeEntitySessionBeanRemote")
     private static RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
-    
-    
-    
-    
+
     public static void main(String[] args) throws InvalidLoginCredentialException, InvalidAccessRightException {
-        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, 
-                partnerEntitySessionBeanRemote, roomEntitySessionBean, roomRateEntitySessionBean);
+        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
+                partnerEntitySessionBeanRemote, roomEntitySessionBean, roomRateEntitySessionBean, guestEntitySessionBeanRemote,
+                unregisteredGuestEntitySessionBeanRemote, reservationEntitySessionBeanRemote);
         mainApp.runApp();
     }
-    
+
 }

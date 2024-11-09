@@ -14,6 +14,7 @@ import javax.ejb.EJB;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
+import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import horsreservationclient.MainApp;
 
 /**
@@ -21,6 +22,9 @@ import horsreservationclient.MainApp;
  * @author mattl
  */
 public class Main {
+
+    @EJB(name = "UnregisteredGuestEntitySessionBeanRemote")
+    private static UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
 
     @EJB(name = "PartnerEntitySessionBeanRemote")
     private static PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
@@ -45,7 +49,7 @@ public class Main {
     
     public static void main(String[] args) throws InvalidLoginCredentialException, InvalidAccessRightException {
         MainApp mainApp = new MainApp(guestEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote,
-            roomEntitySessionBean, roomRateEntitySessionBean, reservationEntitySessionBeanRemote);
+            roomEntitySessionBean, roomRateEntitySessionBean, reservationEntitySessionBeanRemote, unregisteredGuestEntitySessionBeanRemote);
         mainApp.runApp();
     }
     

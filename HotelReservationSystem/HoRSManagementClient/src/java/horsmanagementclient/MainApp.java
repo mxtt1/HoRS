@@ -5,10 +5,13 @@
 package horsmanagementclient;
 
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
+import ejb.session.stateless.GuestEntitySessionBeanRemote;
 import ejb.session.stateless.PartnerEntitySessionBeanRemote;
+import ejb.session.stateless.ReservationEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.EmployeeEntity;
 import java.util.Scanner;
 import javax.ejb.EJB;
@@ -25,9 +28,14 @@ public class MainApp {
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
+    private GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
+    private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
+    private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
+
     
     private SystemAdminModule systemAdminModule;
     private HotelOperationModule hotelOperationModule;
+    private GuestRelationModule guestRelationModule;
     
     private EmployeeEntity currentEmployeeEntity;
     
@@ -39,12 +47,17 @@ public class MainApp {
     }
     
     public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, 
-            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote) {
+            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, 
+            RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, GuestEntitySessionBeanRemote guestEntitySessionBeanRemote,
+            UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
+        this.guestEntitySessionBeanRemote = guestEntitySessionBeanRemote;
+        this.unregisteredGuestEntitySessionBeanRemote = unregisteredGuestEntitySessionBeanRemote;
+        this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
     }
     
     public void runApp() throws InvalidLoginCredentialException, InvalidAccessRightException {
@@ -67,6 +80,9 @@ public class MainApp {
                         systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployeeEntity);
                         hotelOperationModule = new HotelOperationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
                                 roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote);
+                        guestRelationModule = new GuestRelationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
+                                roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote, guestEntitySessionBeanRemote, 
+                                unregisteredGuestEntitySessionBeanRemote, reservationEntitySessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println(ex.getMessage() + "\n");
@@ -110,6 +126,7 @@ public class MainApp {
             System.out.println("You are logged in as " + currentEmployeeEntity.getFullName());
             System.out.println("1: System Administration");
             System.out.println("2: Hotel Operation");
+            System.out.println("3: Guest Relations");
             System.out.println("99: Logout"); // high so we can add more stuff
             response = 0;
 
@@ -126,6 +143,12 @@ public class MainApp {
                 } else if (response == 2) {
                     try {
                         hotelOperationModule.menuHotelOperation();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                } else if (response == 3) {
+                    try {
+                        guestRelationModule.menuGuestRelation();
                     } catch (InvalidAccessRightException ex) {
                         System.out.println(ex.getMessage());
                     }

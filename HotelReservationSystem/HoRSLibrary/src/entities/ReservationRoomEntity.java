@@ -30,6 +30,13 @@ public class ReservationRoomEntity implements Serializable {
     
     @ManyToOne()
     private RoomEntity allocatedRoom;
+
+    public ReservationRoomEntity() {
+    }
+
+    public ReservationRoomEntity(ReservationEntity reservation) {
+        this.reservation = reservation;
+    }
     
     public Long getId() {
         return id;

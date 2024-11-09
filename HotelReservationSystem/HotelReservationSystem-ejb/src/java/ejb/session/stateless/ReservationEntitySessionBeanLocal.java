@@ -15,5 +15,7 @@ import javax.ejb.Local;
 public interface ReservationEntitySessionBeanLocal {
 
     long createNewOnlineReservation(ReservationEntity newReservation, long bookerId, long roomTypeId );
+
+    public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId);
     
 }

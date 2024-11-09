@@ -16,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -59,7 +60,7 @@ public class RoomRateEntity implements Serializable {
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @ManyToMany()
+    @ManyToMany(mappedBy = "roomRates")
     private List<ReservationEntity> reservations;
 
     public RoomRateEntity() {

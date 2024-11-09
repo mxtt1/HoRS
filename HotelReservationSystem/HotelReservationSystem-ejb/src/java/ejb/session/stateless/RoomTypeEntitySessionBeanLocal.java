@@ -34,5 +34,7 @@ public interface RoomTypeEntitySessionBeanLocal {
     public List<RoomTypeEntity> retrieveActiveRoomTypes();
 
     int getAvailableRoomQuantity(Date startDate, Date endDate, RoomTypeEntity roomType);
+
+    public BigDecimal getPublishedRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate);
     
 }

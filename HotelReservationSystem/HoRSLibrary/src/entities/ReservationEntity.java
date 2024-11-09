@@ -6,8 +6,10 @@ package entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,7 +45,8 @@ public class ReservationEntity implements Serializable {
     private Date endDate;
     @Column(nullable = false)
     private int quantity;
-    @Column(nullable = false, precision = 16, scale = 2)
+    
+    @Column(precision = 16, scale = 2)
     private BigDecimal fee;
     
     @ManyToOne(optional = true)
@@ -64,10 +67,10 @@ public class ReservationEntity implements Serializable {
     private RoomTypeEntity roomType;
     
     @OneToMany(mappedBy = "reservation")
-    private List<ReservationRoomEntity> reservationRooms;
+    private List<ReservationRoomEntity> reservationRooms = new ArrayList<>();
     
     @ManyToMany()
-    private List<RoomRateEntity> roomRates;
+    private List<RoomRateEntity> roomRates = new ArrayList<>();
 
     public ReservationEntity() {
     }
@@ -77,6 +80,8 @@ public class ReservationEntity implements Serializable {
         this.endDate = endDate;
         this.quantity = quantity;
     }
+    
+    
 
     public Long getId() {
         return id;

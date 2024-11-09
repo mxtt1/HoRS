@@ -10,6 +10,7 @@ import ejb.session.stateless.ReservationEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.GuestEntity;
 import entities.RoomTypeEntity;
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class MainApp {
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
+    private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
 
     private GuestEntity currentGuestEntity;
     
@@ -43,13 +45,15 @@ public class MainApp {
     private final Scanner sc = new Scanner(System.in);
 
     public MainApp(GuestEntitySessionBeanRemote guestEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBean, RoomRateEntitySessionBeanRemote roomRateEntitySessionBean, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBean, RoomRateEntitySessionBeanRemote roomRateEntitySessionBean, 
+            ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote, UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote) {
         this.guestEntitySessionBeanRemote = guestEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
+        this.unregisteredGuestEntitySessionBeanRemote = unregisteredGuestEntitySessionBeanRemote;
     }
 
     public void runApp() throws InvalidAccessRightException {
@@ -71,7 +75,7 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login Successful");
-                        guestModule = new GuestModule(guestEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentGuestEntity, reservationEntitySessionBeanRemote);
+                        guestModule = new GuestModule(guestEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentGuestEntity, reservationEntitySessionBeanRemote, unregisteredGuestEntitySessionBeanRemote);
                         guestModule.menuSystemGuest();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println(ex.getMessage() + "\n");
@@ -187,8 +191,12 @@ public class MainApp {
         } else {
             System.out.println("Available Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("ID: " + roomType.getId());
-                System.out.print(" Name: " + roomType.getName());
+                System.out.print("Name: " + roomType.getName());
+                System.out.println("Room Description: " + roomType.getDescription());
+                System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
+                System.out.println("Bed: " + roomType.getBedType());
+                System.out.println("Capacity: " + roomType.getCapacity());
+                System.out.println("Amenities: " + roomType.getAmenities());
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.print(" Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
