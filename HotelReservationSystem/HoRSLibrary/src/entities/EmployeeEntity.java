@@ -39,7 +39,7 @@ public class EmployeeEntity implements Serializable {
     private String fullName;
     
     @OneToMany(mappedBy = "employee")
-    private List<ReservationEntity> reservations = new ArrayList<ReservationEntity>();
+    private List<ReservationEntity> reservations;
 
     public EmployeeEntity() {
     }

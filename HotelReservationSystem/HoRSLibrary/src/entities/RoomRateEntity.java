@@ -16,8 +16,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import util.enums.RateType;
 
@@ -26,6 +29,12 @@ import util.enums.RateType;
  * @author mattl
  */
 @Entity
+@NamedQueries ({
+    @NamedQuery(name = "findApplicablePromoRates", query = "SELECT rr FROM RoomRateEntity rr "
+            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = :promotionRate AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate"),
+    @NamedQuery(name = "findApplicablePeakRates", query = "SELECT rr FROM RoomRateEntity rr "
+            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = :peakRate AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate")
+})
 public class RoomRateEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,7 +60,7 @@ public class RoomRateEntity implements Serializable {
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @ManyToMany()
+    @ManyToMany(mappedBy = "roomRates")
     private List<ReservationEntity> reservations;
 
     public RoomRateEntity() {

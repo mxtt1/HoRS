@@ -5,17 +5,22 @@
 package entities;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 
 /**
@@ -23,36 +28,60 @@ import javax.persistence.Temporal;
  * @author mattl
  */
 @Entity
+@NamedQueries ({
+    @NamedQuery(name = "findOverlappingReservations", query = "SELECT re FROM ReservationEntity re WHERE (re.startDate <= :givenEndDate OR re.endDate >= :givenStartDate) AND re.roomType = :roomType")
+})
 public class ReservationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 100)
-    private String guestName;
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date startDate;
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date endDate;
+    @Column(nullable = false)
+    private int quantity;
     
-    @ManyToOne()
+    @Column(precision = 16, scale = 2)
+    private BigDecimal fee;
+    
+    @ManyToOne(optional = true)
     private EmployeeEntity employee;
     
     @ManyToOne(optional = true)
-    private GuestEntity guest;
+    private GuestEntity booker;
+    
+    @ManyToOne(optional = true)
+    private PartnerEntity partner;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private UnregisteredGuestEntity occupant;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @ManyToOne(optional = true)
-    private RoomEntity assignedRoom;
+    @OneToMany(mappedBy = "reservation")
+    private List<ReservationRoomEntity> reservationRooms = new ArrayList<>();
     
     @ManyToMany()
-    private List<RoomRateEntity> roomRates;
+    private List<RoomRateEntity> roomRates = new ArrayList<>();
+
+    public ReservationEntity() {
+    }
+
+    public ReservationEntity(Date startDate, Date endDate, int quantity) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.quantity = quantity;
+    }
+    
+    
 
     public Long getId() {
         return id;
@@ -87,14 +116,6 @@ public class ReservationEntity implements Serializable {
         return "entities.ReservationEntity[ id=" + id + " ]";
     }
 
-    public String getGuestName() {
-        return guestName;
-    }
-
-    public void setGuestName(String guestName) {
-        this.guestName = guestName;
-    }
-
     public Date getStartDate() {
         return startDate;
     }
@@ -119,28 +140,12 @@ public class ReservationEntity implements Serializable {
         this.employee = employee;
     }
 
-    public GuestEntity getGuest() {
-        return guest;
-    }
-
-    public void setGuest(GuestEntity guest) {
-        this.guest = guest;
-    }
-
     public RoomTypeEntity getRoomType() {
         return roomType;
     }
 
     public void setRoomType(RoomTypeEntity roomType) {
         this.roomType = roomType;
-    }
-
-    public RoomEntity getAssignedRoom() {
-        return assignedRoom;
-    }
-
-    public void setAssignedRoom(RoomEntity assignedRoom) {
-        this.assignedRoom = assignedRoom;
     }
 
     public List<RoomRateEntity> getRoomRates() {
@@ -150,5 +155,53 @@ public class ReservationEntity implements Serializable {
     public void setRoomRates(List<RoomRateEntity> roomRates) {
         this.roomRates = roomRates;
     }
-    
+
+    public GuestEntity getBooker() {
+        return booker;
+    }
+
+    public void setBooker(GuestEntity booker) {
+        this.booker = booker;
+    }
+
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public List<ReservationRoomEntity> getReservationRooms() {
+        return reservationRooms;
+    }
+
+    public void setReservationRooms(List<ReservationRoomEntity> reservationRooms) {
+        this.reservationRooms = reservationRooms;
+    }
+
+    public UnregisteredGuestEntity getOccupant() {
+        return occupant;
+    }
+
+    public void setOccupant(UnregisteredGuestEntity occupant) {
+        this.occupant = occupant;
+    }
+
+    public BigDecimal getFee() {
+        return fee;
+    }
+
+    public void setFee(BigDecimal fee) {
+        this.fee = fee;
+    }
+
 }

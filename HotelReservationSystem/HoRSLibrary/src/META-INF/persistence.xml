@@ -9,6 +9,8 @@
     <class>entities.RoomTypeEntity</class>
     <class>entities.RoomEntity</class>
     <class>entities.PartnerEntity</class>
+    <class>entities.ReservationRoomEntity</class>
+    <class>entities.UnregisteredGuestEntity</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/hotelreservationsystem?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

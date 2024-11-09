@@ -16,6 +16,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import util.enums.RoomStatus;
@@ -25,6 +28,9 @@ import util.enums.RoomStatus;
  * @author mattl
  */
 @Entity
+@NamedQueries ({
+    @NamedQuery(name = "findActiveRoomsForRoomType", query = "SELECT r FROM RoomEntity r WHERE r.disabled = FALSE AND r.roomType = :roomType")
+})
 public class RoomEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -46,8 +52,8 @@ public class RoomEntity implements Serializable {
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @OneToMany(mappedBy = "assignedRoom", orphanRemoval = true)
-    private List<ReservationEntity> reservations;
+    @OneToMany(mappedBy = "allocatedRoom")
+    private List<ReservationRoomEntity> reservationRooms;
     
     @OneToOne()
     private ReservationEntity currentReservation;
@@ -118,14 +124,6 @@ public class RoomEntity implements Serializable {
         this.roomType = roomType;
     }
 
-    public List<ReservationEntity> getReservations() {
-        return reservations;
-    }
-
-    public void setReservations(List<ReservationEntity> reservations) {
-        this.reservations = reservations;
-    }
-
     public ReservationEntity getCurrentReservation() {
         return currentReservation;
     }
@@ -140,6 +138,14 @@ public class RoomEntity implements Serializable {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public List<ReservationRoomEntity> getReservationRooms() {
+        return reservationRooms;
+    }
+
+    public void setReservationRooms(List<ReservationRoomEntity> reservationRooms) {
+        this.reservationRooms = reservationRooms;
     }
     
 }

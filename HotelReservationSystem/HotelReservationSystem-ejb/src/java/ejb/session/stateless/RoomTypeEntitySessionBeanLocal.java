@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entities.RoomTypeEntity;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
@@ -28,7 +29,12 @@ public interface RoomTypeEntitySessionBeanLocal {
 
     public List<RoomTypeEntity> getAvailableRoomTypes(Date startDate, Date endDate);
 
-    
-    public int getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate);
+    public BigDecimal getNormalRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate);
+
+    public List<RoomTypeEntity> retrieveActiveRoomTypes();
+
+    int getAvailableRoomQuantity(Date startDate, Date endDate, RoomTypeEntity roomType);
+
+    public BigDecimal getPublishedRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate);
     
 }

@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -19,6 +21,9 @@ import javax.persistence.OneToOne;
  * @author mattl
  */
 @Entity
+@NamedQueries ({
+    @NamedQuery(name = "findActiveRoomTypes", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE")
+})
 public class RoomTypeEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,13 +47,13 @@ public class RoomTypeEntity implements Serializable {
     @Column(nullable = false)
     private boolean disabled;
     
-    @OneToMany(mappedBy = "roomType", orphanRemoval = true)
+    @OneToMany(mappedBy = "roomType")
     private List<RoomRateEntity> allRates;
     
-    @OneToOne(orphanRemoval = true)   
+    @OneToOne()   
     private RoomRateEntity normalRate;
     
-    @OneToOne(orphanRemoval = true)
+    @OneToOne()
     private RoomRateEntity publishedRate;
     
     @OneToMany (mappedBy = "roomType")

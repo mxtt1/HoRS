@@ -18,55 +18,30 @@ import javax.persistence.OneToMany;
  * @author mattl
  */
 @Entity
-public class GuestEntity implements Serializable {
+public class GuestEntity extends UnregisteredGuestEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Column(nullable = false, unique = true, length = 32)
     private String name;
-
-    @Column(nullable = false)
-    private String email;
-    
-    @Column(nullable = false)
-    private String passportNum;
-    
-    @Column(nullable = false)
-    private String phoneNum;
     
     @Column(nullable = false, length = 32)
     private String password;
     
-    @OneToMany(mappedBy = "guest", orphanRemoval = true)
-    private List<ReservationEntity> reservations;
+    @OneToMany(mappedBy = "booker")
+    private List<ReservationEntity> bookedReservations;
 
     public GuestEntity() {
     }
 
-    public GuestEntity(String name, String email, String passportNum, String phoneNum, String password) {
+    public GuestEntity(String name, String passportNum, String password) {
+        super(passportNum);
         this.name = name;
-        this.email = email;
-        this.passportNum = passportNum;
-        this.phoneNum = phoneNum;
         this.password = password;
-    }
-    
-    
-    
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (getId() != null ? getId().hashCode() : 0);
         return hash;
     }
 
@@ -77,7 +52,7 @@ public class GuestEntity implements Serializable {
             return false;
         }
         GuestEntity other = (GuestEntity) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.getId() == null && other.getId() != null) || (this.getId() != null && !this.getId().equals(other.getId()))) {
             return false;
         }
         return true;
@@ -85,7 +60,7 @@ public class GuestEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.GuestEntity[ id=" + id + " ]";
+        return "entities.GuestEntity[ id=" + getId() + " ]";
     }
 
     public String getName() {
@@ -95,42 +70,7 @@ public class GuestEntity implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
-    /**
-     * @return the email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * @return the passportNum
-     */
-    public String getPassportNum() {
-        return passportNum;
-    }
-
-    /**
-     * @param passportNum the passportNum to set
-     */
-    public void setPassportNum(String passportNum) {
-        this.passportNum = passportNum;
-    }
-
-    /**
-     * @return the phoneNum
-     */
-    public String getPhoneNum() {
-        return phoneNum;
-    }
-
-    /**
-     * @param phoneNum the phoneNum to set
-     */
-    public void setPhoneNum(String phoneNum) {
-        this.phoneNum = phoneNum;
-    }
-
+    
     /**
      * @return the password
      */
@@ -145,11 +85,12 @@ public class GuestEntity implements Serializable {
         this.password = password;
     }
 
-    /**
-     * @param email the email to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
+    public List<ReservationEntity> getBookedReservations() {
+        return bookedReservations;
+    }
+
+    public void setBookedReservations(List<ReservationEntity> bookedReservations) {
+        this.bookedReservations = bookedReservations;
     }
     
 }

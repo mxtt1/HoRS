@@ -39,15 +39,24 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         newRoomRate.setRoomType(roomTypeToBeAssigned);
         if (newRoomRate.getRateType() == RateType.NORMAL && roomTypeToBeAssigned.getNormalRate() == null) {
             roomTypeToBeAssigned.setNormalRate(newRoomRate);
+            roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+            em.persist(newRoomRate);
+            em.flush();
+            return newRoomRate.getId();
+        } else if (newRoomRate.getRateType() == RateType.NORMAL) {
+            roomTypeToBeAssigned.getNormalRate().setRatePerNight(newRoomRate.getRatePerNight());
+            return roomTypeToBeAssigned.getNormalRate().getId();
         } else if (newRoomRate.getRateType() == RateType.PUBLISHED && roomTypeToBeAssigned.getPublishedRate() == null) {
-            roomTypeToBeAssigned.setPublishedRate(newRoomRate);       
+            roomTypeToBeAssigned.setPublishedRate(newRoomRate);
+            roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+            em.persist(newRoomRate);
+            em.flush();
+            return newRoomRate.getId();
+        } else {
+            roomTypeToBeAssigned.getPublishedRate().setRatePerNight(newRoomRate.getRatePerNight());
+            return roomTypeToBeAssigned.getPublishedRate().getId();
         }
-        roomTypeToBeAssigned.getAllRates().add(newRoomRate);
-        
-        
-        em.persist(newRoomRate);
-        em.flush();
-        return newRoomRate.getId();
+
     }
 
     @Override
@@ -95,6 +104,24 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     @Override
     public List<RoomRateEntity> retrieveAllRoomRates() {
         return em.createQuery("SELECT rr FROM RoomRateEntity rr", RoomRateEntity.class).getResultList();
+    }
+
+    @Override
+    public List<RoomRateEntity> retrieveApplicablePromoRates(RoomTypeEntity roomType, Date date) {
+        return em.createNamedQuery("findApplicablePromoRates", RoomRateEntity.class)
+                .setParameter("roomType", roomType)
+                .setParameter("givenDate", date)
+                .setParameter("promotionRate", RateType.PROMOTION)
+                .getResultList();
+    }
+
+    @Override
+    public List<RoomRateEntity> retrieveApplicablePeakRates(RoomTypeEntity roomType, Date date) {
+        return em.createNamedQuery("findApplicablePeakRates", RoomRateEntity.class)
+                .setParameter("roomType", roomType)
+                .setParameter("givenDate", date)
+                .setParameter("peakRate", RateType.PEAK)
+                .getResultList();
     }
     
 }
