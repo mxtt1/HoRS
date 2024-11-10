@@ -35,6 +35,10 @@ public class DataInitSessionBean {
         if (em.find(EmployeeEntity.class, 1l)  == null) {
             EmployeeEntity adminEmployee = new EmployeeEntity(EmployeeRole.SYSTEM_ADMIN, "admin", "password", "administrator");
             employeeEntitySessionBeanLocal.createNewEmployee(adminEmployee);
+            EmployeeEntity operationEmployee = new EmployeeEntity(EmployeeRole.OPS_MANAGER, "operation", "password", "operator");
+            employeeEntitySessionBeanLocal.createNewEmployee(operationEmployee);
+            EmployeeEntity GROEmployee = new EmployeeEntity(EmployeeRole.GRO, "GRO", "password", "matt");
+            employeeEntitySessionBeanLocal.createNewEmployee(GROEmployee);
         }
         
     }

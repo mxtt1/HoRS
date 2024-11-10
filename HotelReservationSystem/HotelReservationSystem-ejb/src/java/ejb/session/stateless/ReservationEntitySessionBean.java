@@ -52,8 +52,11 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         RoomTypeEntity roomTypeToSet = em.find(RoomTypeEntity.class, roomTypeId);
         roomTypeToSet.getReservations().add(newReservation);
         newReservation.setRoomType(roomTypeToSet);
+        
+        newReservation.setFee(BigDecimal.ZERO);
         em.persist(newReservation);
         em.flush();
+
         
         for (int i = 1; i <= newReservation.getQuantity(); i++) {
             ReservationRoomEntity newReservationRoom = new ReservationRoomEntity();  
@@ -63,10 +66,10 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
             em.flush();
         }
         
-        BigDecimal totalCost = BigDecimal.ZERO;
         Date currentDate = newReservation.getStartDate();
+        BigDecimal totalCost = BigDecimal.ZERO;
 
-        while (!currentDate.after(newReservation.getEndDate())) {
+        while (currentDate.before(newReservation.getEndDate())) {
             RoomRateEntity applicableRate = null;
             List<RoomRateEntity> promoRates = roomRateEntitySessionBean.retrieveApplicablePromoRates(roomTypeToSet, currentDate);
             List<RoomRateEntity> peakRates = roomRateEntitySessionBean.retrieveApplicablePeakRates(roomTypeToSet, currentDate);
@@ -79,22 +82,17 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
                 applicableRate = roomTypeToSet.getNormalRate();
             }
             
-            if (applicableRate != null) {
-                totalCost = totalCost.add(applicableRate.getRatePerNight());
-            }
+            totalCost = totalCost.add(applicableRate.getRatePerNight());
             
             if (!newReservation.getRoomRates().contains(applicableRate)) {
                 newReservation.getRoomRates().add(applicableRate);
                 applicableRate.getReservations().add(newReservation);
             }
-
+            em.flush();
             // Move to the next day
             currentDate = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24)); 
         }
-        
         newReservation.setFee(totalCost);
-        
-        em.persist(newReservation);
         em.flush();
         return newReservation.getId();
 
@@ -107,10 +105,13 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         newReservation.setEmployee(employee);
         newReservation.setOccupant(guest);
         guest.getReservations().add(newReservation);
+        employee.getReservations().add(newReservation);
         
         RoomTypeEntity roomTypeToSet = em.find(RoomTypeEntity.class, roomTypeId);
         roomTypeToSet.getReservations().add(newReservation);
         newReservation.setRoomType(roomTypeToSet);
+        
+        newReservation.setFee(roomTypeEntitySessionBean.getPublishedRateForDates(roomTypeToSet, newReservation.getStartDate(), newReservation.getEndDate()));
         em.persist(newReservation);
         em.flush();
         
@@ -122,35 +123,10 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
             em.flush();
         }
         
-        BigDecimal totalCost = BigDecimal.ZERO;
-        Date currentDate = newReservation.getStartDate();
+        RoomRateEntity applicableRate = roomTypeToSet.getPublishedRate();
+        applicableRate.getReservations().add(newReservation);
+        newReservation.getRoomRates().add(applicableRate);
         
-        while (!currentDate.after(newReservation.getEndDate())) {
-            RoomRateEntity applicableRate = null;
-            List<RoomRateEntity> promoRates = roomRateEntitySessionBean.retrieveApplicablePromoRates(roomTypeToSet, currentDate);
-            List<RoomRateEntity> peakRates = roomRateEntitySessionBean.retrieveApplicablePeakRates(roomTypeToSet, currentDate);
-            
-            if (!promoRates.isEmpty()) {
-                applicableRate = promoRates.get(0);
-            } else if (!peakRates.isEmpty()) {
-                applicableRate = peakRates.get(0);
-            } else {
-                applicableRate = roomTypeToSet.getPublishedRate();
-            }
-            
-            if (applicableRate != null) {
-                totalCost = totalCost.add(applicableRate.getRatePerNight());
-            }
-            
-            if (!newReservation.getRoomRates().contains(applicableRate)) {
-                newReservation.getRoomRates().add(applicableRate);
-                applicableRate.getReservations().add(newReservation);
-            }
-            currentDate = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24)); 
-        }
-        
-        newReservation.setFee(totalCost);
-        em.persist(newReservation);
         em.flush();
         return newReservation.getId();
     }

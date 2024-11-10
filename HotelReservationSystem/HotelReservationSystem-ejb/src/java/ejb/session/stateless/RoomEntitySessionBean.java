@@ -83,7 +83,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     public void deleteRoom(long roomId) throws NoResultException{
         RoomEntity roomToBeDeleted = em.find(RoomEntity.class, roomId);
         
-        if (roomToBeDeleted.getCurrentReservation() != null) {
+        if (!roomToBeDeleted.getReservationRooms().isEmpty()) {
             roomToBeDeleted.setDisabled(true);
         } else {
             roomToBeDeleted.getRoomType().getRooms().remove(roomToBeDeleted);
