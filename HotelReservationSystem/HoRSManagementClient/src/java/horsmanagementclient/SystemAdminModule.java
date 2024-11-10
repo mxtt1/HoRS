@@ -29,6 +29,8 @@ public class SystemAdminModule {
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
+    
+    private static Scanner sc = new Scanner(System.in);
 
     public SystemAdminModule() {
 
@@ -45,7 +47,6 @@ public class SystemAdminModule {
     }
 
     public void menuSystemAdmin() throws InvalidAccessRightException {
-        Scanner sc = new Scanner(System.in);
 
         if (currentEmployeeEntity.getEmployeeRole() != EmployeeRole.SYSTEM_ADMIN) {
             throw new InvalidAccessRightException("You don't have SYSTEM_ADMIN rights to access the system administration module.");
@@ -63,6 +64,7 @@ public class SystemAdminModule {
             while (response < 1 || response > 99) {
                 System.out.print("> ");
                 response = sc.nextInt();
+                sc.nextLine();
                 if (response == 1) {
                     try {
                         doCreateNewEmployee();
@@ -89,12 +91,9 @@ public class SystemAdminModule {
                 break;
             }
         }
-        sc.close();
     }
 
     private void doCreateNewEmployee() throws InvalidLoginCredentialException {
-        Scanner sc = new Scanner(System.in);
-
         String username;
         String password;
         String fullname;
@@ -118,6 +117,7 @@ public class SystemAdminModule {
         while (response < 1 || response > 5) {
             System.out.print("> ");
             response = sc.nextInt();
+            sc.nextLine();
             if (response == 1) {
                 employeeRole = EmployeeRole.SYSTEM_ADMIN;
             } else if (response == 2) {
@@ -136,11 +136,9 @@ public class SystemAdminModule {
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
-        sc.close();
     }
 
     private void doViewAllEmployees() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nViewing All Employee Records:\n");
         List<EmployeeEntity> employees = employeeEntitySessionBeanRemote.retrieveAllEmployees();
@@ -154,11 +152,9 @@ public class SystemAdminModule {
         } catch (IOException ex) {
             Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
     }
 
     private void doCreateNewPartner() throws InvalidLoginCredentialException {
-        Scanner sc = new Scanner(System.in);
         String username;
         String password;
         System.out.println("\nCreate New Partner Account: ");
@@ -173,11 +169,9 @@ public class SystemAdminModule {
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
-        sc.close();
     }
 
     private void doViewAllPartners() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nViewing All Partner Records:\n");
         List<PartnerEntity> partners = partnerEntitySessionBeanRemote.retrieveAllPartners();
@@ -190,7 +184,6 @@ public class SystemAdminModule {
         } catch (IOException ex) {
             Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
     }
 
 }

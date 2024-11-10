@@ -42,6 +42,8 @@ class GuestRelationModule {
     private GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
     private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
+    
+    private static Scanner sc = new Scanner(System.in);
 
     private EmployeeEntity currentEmployeeEntity;
 
@@ -65,7 +67,6 @@ class GuestRelationModule {
     }
 
     void menuGuestRelation() throws InvalidAccessRightException {
-        Scanner sc = new Scanner(System.in);
         if (currentEmployeeEntity.getEmployeeRole() != EmployeeRole.GRO) {
             throw new InvalidAccessRightException("You don't have rights to access the guest relation module.");
         }
@@ -84,14 +85,13 @@ class GuestRelationModule {
             while (response < 1 || response > 5) {
                 System.out.print("> ");
                 response = sc.nextInt();
+                sc.nextLine();
+                
                 if (response == 1) {
-                    sc.close();
-                    doWalkInSearchRoom();
+                     doWalkInSearchRoom();
                 } else if (response == 2) {
-                    sc.close();
                     doReserveHotelRoom();
                 } else if (response == 3) {
-                    sc.close();
                     doCheckInGuest();
                 } else if (response == 4) {
 
@@ -101,14 +101,13 @@ class GuestRelationModule {
                     System.out.println("Invalid input, try again!");
                 }
             }
-            if (response == 99) {
+            if (response == 5) {
                 break;
             }
         }
     }
 
     private void doWalkInSearchRoom() {
-        Scanner sc = new Scanner(System.in);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
@@ -141,18 +140,18 @@ class GuestRelationModule {
 
         List<RoomTypeEntity> availableRoomTypes = roomTypeEntitySessionBeanRemote.getAvailableRoomTypes(startDate, endDate);
         if (availableRoomTypes.isEmpty()) {
-            System.out.println("No rooms available for the selected date range.");
+            System.out.println("\nNo rooms available for the selected date range.");
         } else {
-            System.out.println("Available Room Types:");
+            System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print(" Name: " + roomType.getName());
-                System.out.println("Room Description: " + roomType.getDescription());
+                System.out.print("\nName: " + roomType.getName());
+                System.out.println(" Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
                 System.out.println("Capacity: " + roomType.getCapacity());
                 System.out.println("Amenities: " + roomType.getAmenities());
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getPublishedRateForDates(roomType, startDate, endDate);
-                System.out.print(" Price: $" + cost);
+                System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
                 System.out.println(" Available Quantity: " + quantity);
             }
@@ -161,26 +160,25 @@ class GuestRelationModule {
         System.out.print("\nPress any key to continue.");
         try {
             System.in.read();
-            sc.close();
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void doWalkInSearchRoom(Date sd, Date ed) {
-        Scanner sc = new Scanner(System.in);
+    private boolean doWalkInSearchRoom(Date sd, Date ed) {
 
         Date startDate = sd;
         Date endDate = ed;
 
         List<RoomTypeEntity> availableRoomTypes = roomTypeEntitySessionBeanRemote.getAvailableRoomTypes(startDate, endDate);
         if (availableRoomTypes.isEmpty()) {
-            System.out.println("No rooms available for the selected date range.");
+            System.out.println("\nNo rooms available for the selected date range.");
+            return false;
         } else {
-            System.out.println("Available Room Types:");
+            System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print(" Name: " + roomType.getName());
-                System.out.println("Room Description: " + roomType.getDescription());
+                System.out.print("\nName: " + roomType.getName());
+                System.out.println(" Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
                 System.out.println("Capacity: " + roomType.getCapacity());
@@ -188,17 +186,17 @@ class GuestRelationModule {
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getPublishedRateForDates(roomType, startDate, endDate);
                 System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-                System.out.println("Available Quantity: " + quantity);
+                System.out.println(" Available Quantity: " + quantity);
             }
         }
 
         System.out.print("\nPress any key to continue.");
         try {
             System.in.read();
-            sc.close();
         } catch (IOException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return true;
     }
 
     private void doCheckInGuest() {
@@ -206,7 +204,6 @@ class GuestRelationModule {
     }
 
     private void doReserveHotelRoom() {
-        Scanner sc = new Scanner(System.in);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
@@ -237,48 +234,50 @@ class GuestRelationModule {
             }
         }
 
-        doWalkInSearchRoom(startDate, endDate);
-        System.out.println("Input room type name to book: ");
-        sc.nextLine();
-        String roomTypeName = sc.nextLine().trim();
-        try {
-            RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
-            int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-            System.out.println("Available Quantity: " + quantity);
-            System.out.println("Input quantity of rooms to book: ");
-            int bookingQuantity = sc.nextInt();
-            while (bookingQuantity > quantity) {
-                System.out.println("Booking quantity cannot exceed available quantity.");
-                System.out.print("Please input a valid quantity> ");
-                bookingQuantity = sc.nextInt();
-            }
-            sc.nextLine();
-            System.out.println("Input guest's passport number: ");
-            String passportNo = sc.nextLine().trim();
-            long guestId = -1;
-            List<GuestEntity> guests = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNo);
-            if (guests.size() == 0) {
-                guestId = unregisteredGuestEntitySessionBeanRemote.createNewUnregisteredGuest(new UnregisteredGuestEntity(passportNo));
-            } else {
-                guestId = guests.get(0).getId();
-            }
-            ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-            long id = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
+        boolean hasAvailableRoomTypes = doWalkInSearchRoom(startDate, endDate);
+        if (hasAvailableRoomTypes) {
+            System.out.print("Input room type name to book> ");
+            String roomTypeName = sc.nextLine().trim();
+            try {
+                RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
+                int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
+                System.out.println("Available Quantity: " + quantity);
+                System.out.print("Input quantity of rooms to book> ");
+                int bookingQuantity = sc.nextInt();
+                while (bookingQuantity > quantity) {
+                    System.out.println("Booking quantity cannot exceed available quantity.");
+                    System.out.print("Please input a valid quantity> ");
+                    bookingQuantity = sc.nextInt();
+                }
+                sc.nextLine();
+                System.out.print("Input guest's passport number> ");
+                String passportNo = sc.nextLine().trim();
+                long guestId = -1;
+                List<GuestEntity> guests = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNo);
+                if (guests.size() == 0) {
+                    guestId = unregisteredGuestEntitySessionBeanRemote.createNewUnregisteredGuest(new UnregisteredGuestEntity(passportNo));
+                } else {
+                    guestId = guests.get(0).getId();
+                }
+                ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
+                long id = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
 
-            Date now = new Date();
-            long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
-            long startOfToday = now.getTime() - timePastMidnight;
-            long twoAM = startOfToday + (2 * 60 * 60 * 1000);
+                Date now = new Date();
+                long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
+                long startOfToday = now.getTime() - timePastMidnight;
+                long twoAM = startOfToday + (2 * 60 * 60 * 1000);
 
-            // check same day and past 2am
-            if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
-                // ALLOCATE ROOM
+                // check same day and past 2am
+                if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
+                    // ALLOCATE ROOM
+                }
+
+                System.out.println("Reservation Successful!");
+            } catch (NoResultException e) {
+                System.out.println(e.getMessage());
             }
-
-            System.out.println("Reservation Successful!");
-            sc.close();
-        } catch (NoResultException e) {
-            System.out.println(e.getMessage());
+        } else {
+            return;
         }
 
     }

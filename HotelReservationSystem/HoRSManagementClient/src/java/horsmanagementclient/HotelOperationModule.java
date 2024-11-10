@@ -46,6 +46,8 @@ public class HotelOperationModule {
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
+    
+    private static Scanner sc = new Scanner(System.in);
 
     private final RankingComparator rankingComparator = new RankingComparator();
 
@@ -64,7 +66,6 @@ public class HotelOperationModule {
     }
 
     public void menuHotelOperation() throws InvalidAccessRightException {
-        Scanner sc = new Scanner(System.in);
 
         if (currentEmployeeEntity.getEmployeeRole() != EmployeeRole.OPS_MANAGER
                 && currentEmployeeEntity.getEmployeeRole() != EmployeeRole.SALES_MANAGER) {
@@ -93,6 +94,8 @@ public class HotelOperationModule {
             while (response < 1 || response > 99) {
                 System.out.print("> ");
                 response = sc.nextInt();
+                sc.nextLine();
+                
                 if (response == 1) {
                     doCreateNewRoomType();
                 } else if (response == 2) {
@@ -129,11 +132,9 @@ public class HotelOperationModule {
                 break;
             }
         }
-        sc.close();
     }
 
     private void doCreateNewRoomType() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nCreate New Room Type: ");
         System.out.print("Enter name> ");
@@ -165,6 +166,7 @@ public class HotelOperationModule {
         while (true) {
             System.out.print("\nEnter ranking of new room (rooms currently at and below the ranking will be shifted downwards)> ");
             int newRoomTypeRanking = sc.nextInt();
+            sc.nextLine();
             if (newRoomTypeRanking <= allRoomTypes.size() && newRoomTypeRanking > 0) {
                 roomTypeEntitySessionBeanRemote.setRoomTypeRanking(newRoomTypeRanking, newRoomTypeId);
                 System.out.println("New room type created succesfully!");
@@ -173,11 +175,9 @@ public class HotelOperationModule {
                 System.out.println("Invalid input! Please try again.");
             }
         }
-        sc.close();
     }
 
     private RoomTypeEntity doViewRoomTypeDetails() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("View Room Type Details: ");
         System.out.print("Enter Name Of Room Type> ");
@@ -196,13 +196,11 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
         return roomType;
 
     }
 
     private void doUpdateRoomTypeRecord() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nUpdate Room Type Details: ");
         System.out.print("Enter Name Of Room Type to Update> ");
@@ -216,26 +214,26 @@ public class HotelOperationModule {
         System.out.println("5. Capacity: " + roomType.getCapacity());
         System.out.print("Select choice of update> ");
         int command = sc.nextInt();
+        sc.nextLine();
         if (command == 5) {
             System.out.print("Input New Capacity> ");
             int newCapacity = sc.nextInt();
+            sc.nextLine();
             roomType.setCapacity(newCapacity);
         } else if (command == 4) {
-            sc.nextLine();
             System.out.print("Input New Bed Type> ");;
             String newBedType = sc.nextLine().trim();
             roomType.setBedType(newBedType);
         } else if (command == 3) {
             System.out.print("Input New Room Size> ");
             int newRoomSize = sc.nextInt();
+            sc.nextLine();
             roomType.setRoomSize(newRoomSize);
         } else if (command == 2) {
-            sc.nextLine();
             System.out.print("Input new Room Description> ");
             String newRoomDescription = sc.nextLine().trim();
             roomType.setDescription(newRoomDescription);
         } else if (command == 1) {
-            sc.nextLine();
             System.out.print("Input new Room Type Name>: ");
             String newRoomName = sc.nextLine().trim();
             roomType.setName(newRoomName);
@@ -255,12 +253,10 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
 
     }
 
     private void doDeleteRoomTypeRecord() {
-        Scanner sc = new Scanner(System.in);
 
         RoomTypeEntity roomTypeToBeDeleted = this.doViewRoomTypeDetails();
         System.out.print("Enter 'y' to confirm deletion> ");
@@ -271,11 +267,9 @@ public class HotelOperationModule {
         } else {
             System.out.println("Deletion cancelled!");
         }
-        sc.close();
     }
 
     private void doViewAllRoomTypeRecords() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nViewing All Room Type Records:\n");
         List<RoomTypeEntity> roomTypes = roomTypeEntitySessionBeanRemote.retrieveAllRoomTypes();
@@ -294,11 +288,9 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
     }
 
     private void doCreateNewRoom() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nCreate New Room: ");
         System.out.print("Enter room number> ");
@@ -314,11 +306,9 @@ public class HotelOperationModule {
         } catch (NoResultException ex) {
             System.out.println("Error: No such room type!");
         }
-        sc.close();
     }
 
     private void doUpdateRoom() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nUpdate Room: ");
         System.out.print("Enter Number Of Room to Update> ");
@@ -330,6 +320,7 @@ public class HotelOperationModule {
         System.out.println("3. Room Status: " + roomEntity.getRoomStatus().name());
         System.out.print("Select choice of update> ");
         int command = sc.nextInt();
+        sc.nextLine();
         RoomEntity newRoom = null;
         if (command == 3) {
             System.out.println("Input New Room Status: ");
@@ -337,6 +328,7 @@ public class HotelOperationModule {
             System.out.println("2. OCCUPIED");
             System.out.print("> ");
             int input = sc.nextInt();
+            sc.nextLine();
             if (input == 1) {
                 roomEntity.setRoomStatus(RoomStatus.AVAILABLE);
             } else if (input == 2) {
@@ -344,12 +336,10 @@ public class HotelOperationModule {
             }
             newRoom = roomEntitySessionBeanRemote.updateRoom(roomEntity);
         } else if (command == 2) {
-            sc.nextLine();
             System.out.print("Input new Room Type> ");
             String newRoomType = sc.nextLine().trim();
             newRoom = roomEntitySessionBeanRemote.changeRoomType(roomEntity.getId(), newRoomType);
         } else if (command == 1) {
-            sc.nextLine();
             System.out.print("Input new Room Number> ");
             String newRoomName = sc.nextLine().trim();
             roomEntity.setRoomNumber(newRoomName);
@@ -367,11 +357,9 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
     }
 
     private void doDeleteRoom() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("Delete Room: ");
         System.out.print("Enter Number Of Room to Delete (eg. 1234) > ");
@@ -386,11 +374,9 @@ public class HotelOperationModule {
         } else {
             System.out.println("Deletion cancelled!");
         }
-        sc.close();
     }
 
     private void doViewAllRooms() {
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nViewing All Rooms:\n");
         List<RoomEntity> rooms = roomEntitySessionBeanRemote.retrieveAllRooms();
@@ -408,11 +394,11 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
+
     }
 
     private void doCreateNewRoomRate() {
-        Scanner sc = new Scanner(System.in);
+
         System.out.println("\nCreate New Room Rate: ");
         System.out.print("Enter name of room type to create new rate for> ");
         String roomType = sc.nextLine().trim();
@@ -421,6 +407,7 @@ public class HotelOperationModule {
         String roomRateName = sc.nextLine().trim();
         System.out.print("Enter amount per night> ");
         BigDecimal ratePerNight = sc.nextBigDecimal();
+        sc.nextLine();
         System.out.println();
 
         System.out.println("1. Published Rate");
@@ -431,6 +418,7 @@ public class HotelOperationModule {
         while (true) {
             System.out.print("Select type of rate to create> ");
             rateType = sc.nextInt();
+            sc.nextLine();
 
             if (rateType == 1 || rateType == 2) {
                 if (rateType == 1) {
@@ -445,7 +433,6 @@ public class HotelOperationModule {
             } else if (rateType == 3 || rateType == 4) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 dateFormat.setLenient(false);
-                sc.nextLine();
                 System.out.print("Enter the starting date (dd-MM-yyyy)> ");
                 String inputDate = sc.nextLine().trim();
                 Date startDate = null;
@@ -476,11 +463,10 @@ public class HotelOperationModule {
             }
         }
         System.out.println("New room rate created successfully!");
-        sc.close();
     }
 
     private RoomRateEntity doViewRoomRateDetails() {
-        Scanner sc = new Scanner(System.in);
+
         System.out.println("\nView Room Rate Details: ");
         System.out.print("Enter Name Of Room Rate> ");
         String roomRateName = sc.nextLine().trim();
@@ -500,16 +486,13 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
         return roomRate;
 
     }
 
     private void doDeleteRoomRateRecord() {
-        Scanner sc = new Scanner(System.in);
 
         RoomRateEntity roomRateToBeDeleted = this.doViewRoomRateDetails();
-        sc.nextLine();
         System.out.print("Enter 'y' to confirm deletion> ");
         String response = sc.nextLine().trim().toLowerCase();
         if (response.equals("y")) {
@@ -518,12 +501,10 @@ public class HotelOperationModule {
         } else {
             System.out.println("Deletion cancelled!");
         }
-        sc.close();
     }
 
     private void doViewAllRoomRateRecords() {
-        Scanner sc = new Scanner(System.in);
-
+  
         System.out.println("\nViewing All Room Rate Records:\n");
         List<RoomRateEntity> roomRates = roomRateEntitySessionBeanRemote.retrieveAllRoomRates();
 
@@ -546,7 +527,6 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sc.close();
     }
 
 }

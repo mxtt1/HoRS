@@ -60,7 +60,6 @@ public class MainApp {
     }
 
     public void runApp() throws InvalidLoginCredentialException, InvalidAccessRightException {
-        Scanner sc = new Scanner(System.in);
         Integer response = 0;
 
         while (true) {
@@ -73,6 +72,7 @@ public class MainApp {
             while (response < 1 || response > 99) {
                 System.out.print("> ");
                 response = sc.nextInt();
+                sc.nextLine();
                 if (response == 1) {
                     try {
                         doLogin();
@@ -97,12 +97,9 @@ public class MainApp {
                 break;
             }
         }
-        sc.close();
     }
 
     private void doLogin() throws InvalidLoginCredentialException {
-        Scanner sc = new Scanner(System.in);
-
         String username = "";
         String password = "";
 
@@ -117,13 +114,11 @@ public class MainApp {
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
-        sc.close();
     }
 
     private void menuMain() throws InvalidAccessRightException {
-        Scanner sc = new Scanner(System.in);
         Integer response = 0;
-
+        
         while (true) {
             System.out.println("\nHoRS Management Client");
             System.out.println("You are logged in as " + currentEmployeeEntity.getFullName());
@@ -136,7 +131,8 @@ public class MainApp {
             while (response < 1 || response > 99) {
                 System.out.print("> ");
                 response = sc.nextInt();
-
+                sc.nextLine();
+                
                 if (response == 1) {
                     try {
                         systemAdminModule.menuSystemAdmin();
@@ -166,6 +162,5 @@ public class MainApp {
                 break;
             }
         }
-        sc.close();
     }
 }
