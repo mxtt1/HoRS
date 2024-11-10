@@ -29,7 +29,7 @@ import javax.persistence.Temporal;
  */
 @Entity
 @NamedQueries ({
-    @NamedQuery(name = "findOverlappingReservations", query = "SELECT re FROM ReservationEntity re WHERE (re.startDate <= :givenEndDate OR re.endDate >= :givenStartDate) AND re.roomType = :roomType")
+    @NamedQuery(name = "findOverlappingReservations", query = "SELECT re FROM ReservationEntity re WHERE (re.startDate < :givenEndDate AND re.endDate > :givenStartDate) AND re.roomType = :roomType")
 })
 public class ReservationEntity implements Serializable {
 
@@ -46,7 +46,7 @@ public class ReservationEntity implements Serializable {
     @Column(nullable = false)
     private int quantity;
     
-    @Column(precision = 16, scale = 2)
+    @Column(precision = 16, scale = 2, nullable = false)
     private BigDecimal fee;
     
     @ManyToOne(optional = true)

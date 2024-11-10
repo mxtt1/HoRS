@@ -55,9 +55,6 @@ public class RoomEntity implements Serializable {
     @OneToMany(mappedBy = "allocatedRoom")
     private List<ReservationRoomEntity> reservationRooms;
     
-    @OneToOne()
-    private ReservationEntity currentReservation;
-
     public RoomEntity() {
     }
 
@@ -122,14 +119,6 @@ public class RoomEntity implements Serializable {
 
     public void setRoomType(RoomTypeEntity roomType) {
         this.roomType = roomType;
-    }
-
-    public ReservationEntity getCurrentReservation() {
-        return currentReservation;
-    }
-
-    public void setCurrentReservation(ReservationEntity currentReservation) {
-        this.currentReservation = currentReservation;
     }
 
     public boolean isDisabled() {
