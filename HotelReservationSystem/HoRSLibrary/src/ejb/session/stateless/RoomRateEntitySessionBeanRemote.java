@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import javax.persistence.NoResultException;
+import util.exception.EntityIsDisabledException;
 
 /**
  *
@@ -17,9 +18,9 @@ import javax.persistence.NoResultException;
 @Remote
 public interface RoomRateEntitySessionBeanRemote {
 
-    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType);
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType)throws EntityIsDisabledException;
 
-    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType);
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType)throws EntityIsDisabledException;
 
     public RoomRateEntity retrieveRoomRateByName(String roomRateName) throws NoResultException;
 

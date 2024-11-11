@@ -4,6 +4,7 @@
  */
 package horsmanagementclient;
 
+import ejb.session.singleton.RoomAllocationSessionBeanRemote;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.GuestEntitySessionBeanRemote;
 import ejb.session.stateless.PartnerEntitySessionBeanRemote;
@@ -32,6 +33,7 @@ public class MainApp {
     private GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
     private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
+    private RoomAllocationSessionBeanRemote allocationSessionBeanRemote;
 
     private SystemAdminModule systemAdminModule;
     private HotelOperationModule hotelOperationModule;
@@ -48,7 +50,8 @@ public class MainApp {
     public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
             PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote,
             RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, GuestEntitySessionBeanRemote guestEntitySessionBeanRemote,
-            UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
+            UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote,
+            RoomAllocationSessionBeanRemote allocationSessionBeanRemote) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
@@ -57,6 +60,7 @@ public class MainApp {
         this.guestEntitySessionBeanRemote = guestEntitySessionBeanRemote;
         this.unregisteredGuestEntitySessionBeanRemote = unregisteredGuestEntitySessionBeanRemote;
         this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
+        this.allocationSessionBeanRemote = allocationSessionBeanRemote;
     }
 
     public void runApp() throws InvalidLoginCredentialException, InvalidAccessRightException {
@@ -77,7 +81,8 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login Successful");
-                        systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployeeEntity);
+                        systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote,
+                                currentEmployeeEntity, allocationSessionBeanRemote);
                         hotelOperationModule = new HotelOperationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
                                 roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote);
                         guestRelationModule = new GuestRelationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,

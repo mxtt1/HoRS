@@ -12,6 +12,8 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import util.enums.RoomStatus;
 import util.exception.EntityIsDisabledException;
 
 /**
@@ -109,6 +111,13 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         em.flush();
         
         return roomToChangeType;
+    }
+
+    @Override
+    public List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId) {
+        TypedQuery<RoomEntity> query = em.createQuery("SELECT r FROM RoomEntity r WHERE r.disabled = false AND r.roomStatus = :roomStatus AND r.roomType.id = :roomTypeId", RoomEntity.class);
+        query.setParameter("roomStatus", RoomStatus.AVAILABLE).setParameter("roomTypeId", roomTypeId);
+        return query.getResultList();
     }
 
 }

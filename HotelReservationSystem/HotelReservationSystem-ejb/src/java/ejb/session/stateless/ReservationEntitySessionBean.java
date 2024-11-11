@@ -4,10 +4,12 @@
  */
 package ejb.session.stateless;
 
+import entities.AllocationExceptionEntity;
 import entities.EmployeeEntity;
 import entities.GuestEntity;
 import entities.ReservationEntity;
 import entities.ReservationRoomEntity;
+import entities.RoomEntity;
 import entities.RoomRateEntity;
 import entities.RoomTypeEntity;
 import entities.UnregisteredGuestEntity;
@@ -15,10 +17,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.enums.RoomStatus;
 
 /**
  *
@@ -26,6 +30,9 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class ReservationEntitySessionBean implements ReservationEntitySessionBeanRemote, ReservationEntitySessionBeanLocal {
+
+    @EJB
+    private RoomEntitySessionBeanLocal roomEntitySessionBean;
 
     @EJB
     private RoomRateEntitySessionBeanLocal roomRateEntitySessionBean;
@@ -129,6 +136,58 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         
         em.flush();
         return newReservation.getId();
+    }
+
+    @Override
+    @Asynchronous
+    public void allocateRoomsToReservation(long reservationId) {
+        ReservationEntity reservationToAllocate = em.find(ReservationEntity.class, reservationId);
+        RoomTypeEntity roomTypeToAllocate = reservationToAllocate.getRoomType();
+        for (ReservationRoomEntity rr : reservationToAllocate.getReservationRooms()) {
+            List<RoomEntity> availableRooms = roomEntitySessionBean.findUnassignedRoomsForRoomType(roomTypeToAllocate.getId());
+
+            if (!availableRooms.isEmpty() && rr.getAllocatedRoom() == null) { // there is an available unassigned room
+                RoomEntity roomToAllocate = availableRooms.get(0);
+                roomToAllocate.getReservationRooms().add(rr);
+                rr.setAllocatedRoom(roomToAllocate);
+                roomToAllocate.setRoomStatus(RoomStatus.ASSIGNED);
+            } else if (roomTypeToAllocate.getRanking() == 1 && rr.getAllocatedRoom() == null) { // no available roosm of original room type and no better room type  
+                String exceptionMessage = "Unable to assign room of type " + roomTypeToAllocate.getName()
+                        + " for reservation made by guest with passport number "
+                        + reservationToAllocate.getOccupant().getPassportNum() + " starting on " + reservationToAllocate.getStartDate();
+                AllocationExceptionEntity newAllocationException = new AllocationExceptionEntity(false, exceptionMessage);
+                newAllocationException.setReservationRoom(rr);
+                rr.setAllocationException(newAllocationException);
+                em.persist(newAllocationException);
+            } else if(rr.getAllocatedRoom() == null) { // check the better room type
+                RoomTypeEntity upgradedRoomType = em.createNamedQuery("findUpgradedRoomType", RoomTypeEntity.class)
+                        .setParameter("givenRanking", roomTypeToAllocate.getRanking() - 1).getSingleResult();
+                availableRooms = roomEntitySessionBean.findUnassignedRoomsForRoomType(upgradedRoomType.getId());
+
+                if (!availableRooms.isEmpty()) {
+                    RoomEntity roomToAllocate = availableRooms.get(0);
+                    roomToAllocate.getReservationRooms().add(rr);
+                    rr.setAllocatedRoom(roomToAllocate);
+                    roomToAllocate.setRoomStatus(RoomStatus.ASSIGNED);
+                    String exceptionMessage = "Automatically assigned room of upgraded type " + upgradedRoomType.getName()
+                            + " for reservation made by guest with passport number "
+                            + reservationToAllocate.getOccupant().getPassportNum() + " starting on " + reservationToAllocate.getStartDate();
+                    AllocationExceptionEntity newAllocationException = new AllocationExceptionEntity(true, exceptionMessage);
+                    newAllocationException.setReservationRoom(rr);
+                    rr.setAllocationException(newAllocationException);
+                    em.persist(newAllocationException);
+                } else {
+                    String exceptionMessage = "Unable to assign room of type " + roomTypeToAllocate.getName()
+                            + " for reservation made by guest with passport number "
+                            + reservationToAllocate.getOccupant().getPassportNum() + " starting on " + reservationToAllocate.getStartDate();
+                    AllocationExceptionEntity newAllocationException = new AllocationExceptionEntity(false, exceptionMessage);
+                    newAllocationException.setReservationRoom(rr);
+                    rr.setAllocationException(newAllocationException);
+                    em.persist(newAllocationException);
+                }
+            }
+        em.flush();    
+        }
     }
     
 }

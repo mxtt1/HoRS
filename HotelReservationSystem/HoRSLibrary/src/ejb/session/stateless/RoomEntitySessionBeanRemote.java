@@ -31,4 +31,6 @@ public interface RoomEntitySessionBeanRemote {
     public RoomEntity updateRoom(RoomEntity room);
 
     public RoomEntity changeRoomType(long roomId, String newRoomTypeName);
+
+    List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId);
 }

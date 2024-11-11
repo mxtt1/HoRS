@@ -11,6 +11,7 @@
     <class>entities.PartnerEntity</class>
     <class>entities.ReservationRoomEntity</class>
     <class>entities.UnregisteredGuestEntity</class>
+    <class>entities.AllocationExceptionEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>

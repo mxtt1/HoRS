@@ -21,14 +21,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
-import util.exception.InvalidLoginCredentialException;
 import util.RankingComparator;
 import util.enums.RateType;
 import util.enums.RoomStatus;
@@ -423,10 +418,18 @@ public class HotelOperationModule {
             if (rateType == 1 || rateType == 2) {
                 if (rateType == 1) {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PUBLISHED, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 } else {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.NORMAL, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 }
                 break;
 
@@ -452,10 +455,18 @@ public class HotelOperationModule {
 
                 if (rateType == 3) {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PEAK, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 } else {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PROMOTION, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 }
                 break;
             } else {

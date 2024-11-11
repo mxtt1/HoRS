@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entities.GuestEntity;
+import entities.UnregisteredGuestEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -52,10 +53,11 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     }
     
     @Override
-    public List<GuestEntity> retrieveGuestByPassportNo(String passportNo) {
-        List<GuestEntity> guests = em.createQuery("SELECT e FROM UnregisteredGuestEntity e WHERE e.passportNum = :passportNo", GuestEntity.class)
+    public List<UnregisteredGuestEntity> retrieveGuestByPassportNo(String passportNo) {
+        List<UnregisteredGuestEntity> guests = em.createQuery("SELECT e FROM UnregisteredGuestEntity e WHERE e.passportNum = :passportNo", UnregisteredGuestEntity.class)
              .setParameter("passportNo", passportNo).getResultList();
           
         return guests;
     }
+    
 }

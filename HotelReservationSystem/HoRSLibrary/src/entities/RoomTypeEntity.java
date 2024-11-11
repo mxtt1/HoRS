@@ -22,7 +22,8 @@ import javax.persistence.OneToOne;
  */
 @Entity
 @NamedQueries ({
-    @NamedQuery(name = "findActiveRoomTypes", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE")
+    @NamedQuery(name = "findActiveRoomTypes", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE"),
+    @NamedQuery(name = "findUpgradedRoomType", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE AND rt.ranking = :givenRanking")
 })
 public class RoomTypeEntity implements Serializable {
 
@@ -30,7 +31,7 @@ public class RoomTypeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = false, length = 32)
     private String name;
     @Column(nullable = false)
     private String description;

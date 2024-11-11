@@ -9,6 +9,7 @@ import entities.RoomTypeEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.EntityIsDisabledException;
 
 /**
  *
@@ -18,6 +19,10 @@ import javax.ejb.Local;
 public interface RoomRateEntitySessionBeanLocal {
 
     void deleteRoomRate(long roomRateId);
+    
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType)throws EntityIsDisabledException;
+
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType)throws EntityIsDisabledException;
 
     public List<RoomRateEntity> retrieveAllRoomRates();
 

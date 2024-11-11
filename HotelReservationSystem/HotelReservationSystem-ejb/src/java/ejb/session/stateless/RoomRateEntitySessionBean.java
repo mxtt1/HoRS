@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import util.enums.RateType;
+import util.exception.EntityIsDisabledException;
 
 /**
  *
@@ -33,10 +34,13 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     // "Insert Code > Add Business Method")
 
     @Override
-    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) {
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) throws EntityIsDisabledException{
         RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
         
         newRoomRate.setRoomType(roomTypeToBeAssigned);
+        if (roomTypeToBeAssigned.isDisabled()) {
+            throw new EntityIsDisabledException("Error: room type is disabled!");
+        }
         if (newRoomRate.getRateType() == RateType.NORMAL && roomTypeToBeAssigned.getNormalRate() == null) {
             roomTypeToBeAssigned.setNormalRate(newRoomRate);
             roomTypeToBeAssigned.getAllRates().add(newRoomRate);
@@ -60,12 +64,14 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     }
 
     @Override
-    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) {
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) throws EntityIsDisabledException{
         RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
-
+        if (roomTypeToBeAssigned.isDisabled()) {
+            throw new EntityIsDisabledException("Error: room type is disabled!");
+        }
         newRoomRate.setRoomType(roomTypeToBeAssigned);
         roomTypeToBeAssigned.getAllRates().add(newRoomRate);
-        
+
         newRoomRate.setStartDate(startDate);
         newRoomRate.setEndDate(endDate);
 

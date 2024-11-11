@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.persistence.NoResultException;
 import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
@@ -46,7 +47,7 @@ class GuestRelationModule {
     private static Scanner sc = new Scanner(System.in);
 
     private EmployeeEntity currentEmployeeEntity;
-
+    
     public GuestRelationModule() {
 
     }
@@ -253,23 +254,24 @@ class GuestRelationModule {
                 System.out.print("Input guest's passport number> ");
                 String passportNo = sc.nextLine().trim();
                 long guestId = -1;
-                List<GuestEntity> guests = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNo);
+                List<UnregisteredGuestEntity> guests = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNo);
                 if (guests.size() == 0) {
                     guestId = unregisteredGuestEntitySessionBeanRemote.createNewUnregisteredGuest(new UnregisteredGuestEntity(passportNo));
                 } else {
                     guestId = guests.get(0).getId();
                 }
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-                long id = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
+                long newReservationId = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
 
                 Date now = new Date();
-                long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
-                long startOfToday = now.getTime() - timePastMidnight;
-                long twoAM = startOfToday + (2 * 60 * 60 * 1000);
+                long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000); // Get time after midnight
+                long startOfToday = now.getTime() - timePastMidnight;  // Start of today in milliseconds
+                long twoAM = startOfToday + (2 * 60 * 60 * 1000);  // Two AM in milliseconds
+
 
                 // check same day and past 2am
                 if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
-                    // ALLOCATE ROOM
+                    reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
                 }
 
                 System.out.println("Reservation Successful!");

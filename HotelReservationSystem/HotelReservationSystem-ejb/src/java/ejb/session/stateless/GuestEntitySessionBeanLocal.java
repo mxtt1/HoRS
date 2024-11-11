@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entities.GuestEntity;
+import entities.UnregisteredGuestEntity;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.InvalidLoginCredentialException;
@@ -22,6 +23,6 @@ public interface GuestEntitySessionBeanLocal {
 
     public GuestEntity guestLogin(String username, String password) throws InvalidLoginCredentialException;
 
-    public List<GuestEntity> retrieveGuestByPassportNo(String passportNo);
+    public List<UnregisteredGuestEntity> retrieveGuestByPassportNo(String passportNo);
 
 }

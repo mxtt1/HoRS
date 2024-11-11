@@ -18,4 +18,6 @@ public interface ReservationEntitySessionBeanRemote {
 
     public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId);
 
+    void allocateRoomsToReservation(long reservationId);
+
 }

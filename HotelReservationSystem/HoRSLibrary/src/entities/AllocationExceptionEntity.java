@@ -5,12 +5,12 @@
 package entities;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 /**
@@ -18,28 +18,27 @@ import javax.persistence.OneToOne;
  * @author mattl
  */
 @Entity
-public class ReservationRoomEntity implements Serializable {
+public class AllocationExceptionEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    private boolean resolved;
+    @Column(nullable = false)
+    private String message;
 
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false) 
     @JoinColumn(nullable = false)
-    private ReservationEntity reservation;
-    
-    @ManyToOne()
-    private RoomEntity allocatedRoom;
-    
-    @OneToOne(mappedBy = "reservationRoom")
-    private AllocationExceptionEntity allocationException;
-    
-    public ReservationRoomEntity() {
+    private ReservationRoomEntity reservationRoom;
+
+    public AllocationExceptionEntity() {
     }
 
-    public ReservationRoomEntity(ReservationEntity reservation) {
-        this.reservation = reservation;
+    public AllocationExceptionEntity(boolean resolved, String message) {
+        this.resolved = resolved;
+        this.message = message;
     }
     
     public Long getId() {
@@ -60,10 +59,10 @@ public class ReservationRoomEntity implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ReservationRoomEntity)) {
+        if (!(object instanceof AllocationExceptionEntity)) {
             return false;
         }
-        ReservationRoomEntity other = (ReservationRoomEntity) object;
+        AllocationExceptionEntity other = (AllocationExceptionEntity) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -72,31 +71,30 @@ public class ReservationRoomEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.ReservationRoomEntity[ id=" + id + " ]";
-    }
-
-    public ReservationEntity getReservation() {
-        return reservation;
-    }
-
-    public void setReservation(ReservationEntity reservation) {
-        this.reservation = reservation;
-    }
-
-    public RoomEntity getAllocatedRoom() {
-        return allocatedRoom;
-    }
-
-    public void setAllocatedRoom(RoomEntity allocatedRoom) {
-        this.allocatedRoom = allocatedRoom;
-    }
-
-    public AllocationExceptionEntity getAllocationException() {
-        return allocationException;
-    }
-
-    public void setAllocationException(AllocationExceptionEntity allocationException) {
-        this.allocationException = allocationException;
+        return "entities.AllocationExceptionEntity[ id=" + id + " ]";
     }
     
+    public boolean isResolved() {
+        return resolved;
+    }
+
+    public void setResolved(boolean resolved) {
+        this.resolved = resolved;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public ReservationRoomEntity getReservationRoom() {
+        return reservationRoom;
+    }
+
+    public void setReservationRoom(ReservationRoomEntity reservationRoom) {
+        this.reservationRoom = reservationRoom;
+    }
 }

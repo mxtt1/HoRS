@@ -14,7 +14,6 @@ import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.GuestEntity;
 import entities.ReservationEntity;
 import entities.RoomTypeEntity;
-import entities.UnregisteredGuestEntity;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -228,7 +227,7 @@ class GuestModule {
                 sc.nextLine();
                 long guestId = currentGuestEntity.getId();
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-                long id = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
+                long newReservationId = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
 
                 Date now = new Date();
                 long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
@@ -237,7 +236,7 @@ class GuestModule {
 
                 // check same day and past 2am
                 if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
-                    // ALLOCATE ROOM
+                    reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
                 }
 
                 System.out.println("Reservation Successful!");
