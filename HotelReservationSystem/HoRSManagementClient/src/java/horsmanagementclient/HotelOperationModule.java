@@ -4,6 +4,7 @@
  */
 package horsmanagementclient;
 
+import ejb.session.singleton.RoomAllocationSessionBeanRemote;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
@@ -39,6 +40,7 @@ public class HotelOperationModule {
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
+    private RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
     
@@ -51,13 +53,14 @@ public class HotelOperationModule {
     }
 
     public HotelOperationModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote) {
         this();
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
+        this.roomAllocationSessionBeanRemote = roomAllocationSessionBeanRemote;
     }
 
     public void menuHotelOperation() throws InvalidAccessRightException {
@@ -83,6 +86,7 @@ public class HotelOperationModule {
             System.out.println("11. View Room Rate Details");
             System.out.println("13. Delete Room Rate");
             System.out.println("14. View All Room Rates");
+            System.out.println("15. Manually Allocate Rooms");
             System.out.println("99. Exit");
             response = 0;
 
@@ -117,7 +121,10 @@ public class HotelOperationModule {
                     doDeleteRoomRateRecord();
                 } else if (response == 14) {
                     doViewAllRoomRateRecords();
-                } else if (response == 99) {
+                } else if (response == 15) {
+                    doManuallyAllocateRooms();
+                }
+                else if (response == 99) {
                     break;
                 } else {
                     System.out.println("Invalid input, try again!");
@@ -541,6 +548,29 @@ public class HotelOperationModule {
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void doManuallyAllocateRooms() {
+        System.out.println("\nManually allocating rooms:\n");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        
+        Date givenDate = null;
+        while (givenDate == null) {
+            System.out.print("Enter date for allocation (format: dd-MM-yyyy, e.g., 12-10-2002): ");
+            String startInput = sc.nextLine();
+            try {
+                givenDate = dateFormat.parse(startInput);
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use dd-MM-yyyy.");
+            }
+        }
+        //try {
+            roomAllocationSessionBeanRemote.allocateRoomsForDate(givenDate);
+            System.out.println("Rooms allocated successfully!");
+       // } catch (){
+
+       // }
     }
 
 }

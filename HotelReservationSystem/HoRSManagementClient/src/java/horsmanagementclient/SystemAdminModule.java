@@ -66,7 +66,6 @@ public class SystemAdminModule {
             System.out.println("2. View All Employees");
             System.out.println("3. Create New Partner");
             System.out.println("4. View All Partners");
-            System.out.println("5. Manually Allocate Rooms");
             System.out.println("99. Exit");
             response = 0;
 
@@ -90,8 +89,6 @@ public class SystemAdminModule {
                     }
                 } else if (response == 4) {
                     doViewAllPartners();
-                } else if (response == 5) {
-                    doManuallyAllocateRooms();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -197,6 +194,7 @@ public class SystemAdminModule {
         }
     }
 
+    /*
     private void doManuallyAllocateRooms() {
         System.out.println("\nManually allocating rooms:\n");
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -219,5 +217,6 @@ public class SystemAdminModule {
 
        // }
     }
+*/
 
 }

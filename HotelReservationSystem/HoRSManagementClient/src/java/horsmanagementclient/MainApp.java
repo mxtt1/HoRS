@@ -34,10 +34,11 @@ public class MainApp {
     private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
     private RoomAllocationSessionBeanRemote allocationSessionBeanRemote;
+    
 
     private SystemAdminModule systemAdminModule;
     private HotelOperationModule hotelOperationModule;
-    private GuestRelationModule guestRelationModule;
+    private FrontOfficeModule frontOfficeModule;
 
     private EmployeeEntity currentEmployeeEntity;
 
@@ -84,8 +85,8 @@ public class MainApp {
                         systemAdminModule = new SystemAdminModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote,
                                 currentEmployeeEntity, allocationSessionBeanRemote);
                         hotelOperationModule = new HotelOperationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
-                                roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote);
-                        guestRelationModule = new GuestRelationModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
+                                roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote, allocationSessionBeanRemote);
+                        frontOfficeModule = new FrontOfficeModule(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
                                 roomEntitySessionBeanRemote, currentEmployeeEntity, roomRateEntitySessionBeanRemote, guestEntitySessionBeanRemote,
                                 unregisteredGuestEntitySessionBeanRemote, reservationEntitySessionBeanRemote);
                         menuMain();
@@ -129,7 +130,7 @@ public class MainApp {
             System.out.println("You are logged in as " + currentEmployeeEntity.getFullName());
             System.out.println("1: System Administration");
             System.out.println("2: Hotel Operation");
-            System.out.println("3: Guest Relations");
+            System.out.println("3: Front Office");
             System.out.println("99: Logout"); // high so we can add more stuff
             response = 0;
 
@@ -152,7 +153,7 @@ public class MainApp {
                     }
                 } else if (response == 3) {
                     try {
-                        guestRelationModule.menuGuestRelation();
+                        frontOfficeModule.menuGuestRelation();
                     } catch (InvalidAccessRightException ex) {
                         System.out.println(ex.getMessage());
                     }

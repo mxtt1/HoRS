@@ -196,6 +196,8 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         
         for (ReservationEntity re : reservations){
             re.getRoomType().getName();
+            re.getReservationRooms().size();
+            
         } 
         return reservations;
     }
