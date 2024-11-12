@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entities.GuestEntity;
+import entities.ReservationEntity;
 import entities.UnregisteredGuestEntity;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -25,8 +26,29 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
 
     @Override
     public long createNewGuest(GuestEntity newGuest) {
-        em.persist(newGuest);
-        em.flush();
+        List<UnregisteredGuestEntity> duplicate = em.createQuery("SELECT g FROM UnregisteredGuestEntity g WHERE g.passportNum = :passportNum")
+                .setParameter("passportNum", newGuest.getPassportNum())
+                .getResultList();
+        String passportNum = newGuest.getPassportNum();
+        newGuest.setPassportNum("TEMPORARY");
+                
+        if (!duplicate.isEmpty()) {
+            UnregisteredGuestEntity guestToDelete = duplicate.get(0);
+            List<ReservationEntity> reservations =  guestToDelete.getReservations();
+            
+            for (ReservationEntity re : reservations) {
+                re.setOccupant(newGuest);
+            }
+            newGuest.getReservations().addAll(reservations);
+            guestToDelete.getReservations().clear();
+            em.remove(guestToDelete);
+            em.persist(newGuest);
+            em.flush();
+            newGuest.setPassportNum(passportNum);
+        } else {
+            em.persist(newGuest);
+            em.flush();
+        }
         return newGuest.getId();
     }
     

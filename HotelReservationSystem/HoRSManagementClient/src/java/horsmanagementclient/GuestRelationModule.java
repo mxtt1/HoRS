@@ -158,7 +158,7 @@ class GuestRelationModule {
             }
         }
 
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -191,7 +191,7 @@ class GuestRelationModule {
             }
         }
 
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {

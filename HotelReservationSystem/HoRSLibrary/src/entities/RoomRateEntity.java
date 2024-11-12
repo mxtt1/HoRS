@@ -6,6 +6,7 @@ package entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -61,7 +62,7 @@ public class RoomRateEntity implements Serializable {
     private RoomTypeEntity roomType;
     
     @ManyToMany(mappedBy = "roomRates")
-    private List<ReservationEntity> reservations;
+    private List<ReservationEntity> reservations = new ArrayList<>();
 
     public RoomRateEntity() {
         this.disabled = false;

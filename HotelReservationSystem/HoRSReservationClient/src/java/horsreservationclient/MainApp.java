@@ -198,7 +198,7 @@ public class MainApp {
             System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
                 System.out.print("\nName: " + roomType.getName());
-                System.out.println(" Room Description: " + roomType.getDescription());
+                System.out.println(" | Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
                 System.out.println("Capacity: " + roomType.getCapacity());
@@ -206,11 +206,11 @@ public class MainApp {
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-                System.out.println(" Available Quantity: " + quantity);
+                System.out.println(" | Available Quantity: " + quantity);
             }
         }
         
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {

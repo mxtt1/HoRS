@@ -185,7 +185,7 @@ public class HotelOperationModule {
         System.out.println("Bed: " + roomType.getBedType());
         System.out.println("Capacity: " + roomType.getCapacity());
         System.out.println("Amenities: " + roomType.getAmenities());
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -242,7 +242,7 @@ public class HotelOperationModule {
         System.out.println("Capacity: " + newRoomType.getCapacity());
         System.out.println("Amenities: " + newRoomType.getAmenities());
 
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -277,7 +277,7 @@ public class HotelOperationModule {
             System.out.println("ID: " + rt.getId() + " | Name: " + rt.getName() + " | Ranking: " + rt.getRanking());
         }
 
-        System.out.println("\nPress any key to continue.");
+        System.out.println("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -346,7 +346,7 @@ public class HotelOperationModule {
         System.out.println("Room Type: " + newRoom.getRoomType().getName());
         System.out.println("Room Status: " + newRoom.getRoomStatus().name());
 
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -383,7 +383,7 @@ public class HotelOperationModule {
             System.out.println("ID: " + room.getId() + " | Number: " + room.getRoomNumber() + " | Status: " + room.getRoomStatus().name() + " | Type: " + room.getRoomType().getName());
         }
 
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -449,6 +449,9 @@ public class HotelOperationModule {
                 Date endDate = null;
                 try {
                     endDate = dateFormat.parse(secondInputDate);
+                    if (endDate.before(startDate)) {
+                        System.out.println("End date must be after the start date.");
+                    }
                 } catch (ParseException ex) {
                     Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -491,7 +494,7 @@ public class HotelOperationModule {
             System.out.println("Start Date: " + roomRate.getStartDate());
             System.out.println("End Date: " + roomRate.getEndDate());
         }
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -532,7 +535,7 @@ public class HotelOperationModule {
 
         }
 
-        System.out.println("\nPress any key to continue.");
+        System.out.println("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {

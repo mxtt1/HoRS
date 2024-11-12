@@ -83,7 +83,7 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
             
             if (!(promoRates == null) && !promoRates.isEmpty() ) {
                 applicableRate = promoRates.get(0);
-            } else if (!(promoRates == null) && !peakRates.isEmpty()) {
+            } else if (!(peakRates == null) && !peakRates.isEmpty()) {
                 applicableRate = peakRates.get(0);
             } else {
                 applicableRate = roomTypeToSet.getNormalRate();
@@ -139,7 +139,6 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
     }
 
     @Override
-    @Asynchronous
     public void allocateRoomsToReservation(long reservationId) {
         ReservationEntity reservationToAllocate = em.find(ReservationEntity.class, reservationId);
         RoomTypeEntity roomTypeToAllocate = reservationToAllocate.getRoomType();
@@ -189,5 +188,22 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         em.flush();    
         }
     }
+
+    @Override
+    public List<ReservationEntity> retrieveAllReservationsForGuest(long guestId) {
+        UnregisteredGuestEntity guest = em.find(UnregisteredGuestEntity.class, guestId);
+        List<ReservationEntity> reservations = guest.getReservations();
+        
+        for (ReservationEntity re : reservations){
+            re.getRoomType().getName();
+        } 
+        return reservations;
+    }
+
+    @Override
+    public ReservationEntity retrieveReservation(long reservationId) {
+        return em.find(ReservationEntity.class, reservationId);
+    }
+    
     
 }

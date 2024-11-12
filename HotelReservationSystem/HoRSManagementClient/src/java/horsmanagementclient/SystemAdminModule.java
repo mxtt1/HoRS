@@ -157,7 +157,7 @@ public class SystemAdminModule {
             System.out.println("ID: " + e.getId() + " Full Name: " + e.getFullName()
                     + " Username: " + e.getUsername() + " Password: " + e.getPassword());
         }
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -189,7 +189,7 @@ public class SystemAdminModule {
         for (PartnerEntity p : partners) {
             System.out.println("ID: " + p.getPartnerEntityId() + " Username: " + p.getUsername());
         }
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {

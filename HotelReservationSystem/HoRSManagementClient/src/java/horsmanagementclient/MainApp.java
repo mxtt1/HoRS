@@ -108,7 +108,7 @@ public class MainApp {
         String username = "";
         String password = "";
 
-        System.out.println("Login: ");
+        System.out.println("\nLogin: ");
         System.out.print("Enter username> ");
         username = sc.nextLine().trim();
         System.out.print("Enter password> ");

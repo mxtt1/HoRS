@@ -5,6 +5,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,7 +50,7 @@ public class RoomTypeEntity implements Serializable {
     private boolean disabled;
     
     @OneToMany(mappedBy = "roomType")
-    private List<RoomRateEntity> allRates;
+    private List<RoomRateEntity> allRates = new ArrayList<>();
     
     @OneToOne()   
     private RoomRateEntity normalRate;
@@ -58,10 +59,10 @@ public class RoomTypeEntity implements Serializable {
     private RoomRateEntity publishedRate;
     
     @OneToMany (mappedBy = "roomType")
-    private List<RoomEntity> rooms;
+    private List<RoomEntity> rooms = new ArrayList<>();
     
     @OneToMany(mappedBy = "roomType")
-    private List<ReservationEntity> reservations;
+    private List<ReservationEntity> reservations = new ArrayList<>();
     
     public RoomTypeEntity() {
         this.disabled = false;
