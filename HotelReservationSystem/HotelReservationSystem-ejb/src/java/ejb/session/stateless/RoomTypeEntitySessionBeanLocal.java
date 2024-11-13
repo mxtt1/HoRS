@@ -20,6 +20,8 @@ public interface RoomTypeEntitySessionBeanLocal {
     long createNewRoomType(RoomTypeEntity newRoomType);
 
     List<RoomTypeEntity> retrieveAllRoomTypes();
+    
+    void setRoomTypeRanking(int ranking, long roomId);
 
     void deleteRoomType(long roomTypeId);
 

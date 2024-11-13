@@ -4,10 +4,13 @@
  */
 package horsmanagementclient;
 
+import ejb.session.singleton.RoomAllocationSessionBeanRemote;
+import ejb.session.stateless.AllocationExceptionEntitySessionBeanRemote;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
+import entities.AllocationExceptionEntity;
 import entities.EmployeeEntity;
 import entities.RoomEntity;
 import entities.RoomRateEntity;
@@ -16,19 +19,15 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
-import util.exception.InvalidLoginCredentialException;
 import util.RankingComparator;
 import util.enums.RateType;
 import util.enums.RoomStatus;
@@ -44,6 +43,8 @@ public class HotelOperationModule {
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
+    private RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote;
+    private AllocationExceptionEntitySessionBeanRemote allocationExceptionEntitySessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
     
@@ -56,13 +57,16 @@ public class HotelOperationModule {
     }
 
     public HotelOperationModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote,
+            AllocationExceptionEntitySessionBeanRemote allocationExceptionEntitySessionBeanRemote) {
         this();
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
+        this.roomAllocationSessionBeanRemote = roomAllocationSessionBeanRemote;
+        this.allocationExceptionEntitySessionBeanRemote = allocationExceptionEntitySessionBeanRemote;
     }
 
     public void menuHotelOperation() throws InvalidAccessRightException {
@@ -86,8 +90,11 @@ public class HotelOperationModule {
             System.out.println("9. View All Rooms");
             System.out.println("10. Create New Room Rate");
             System.out.println("11. View Room Rate Details");
+            System.out.println("12. Update Room Rate");
             System.out.println("13. Delete Room Rate");
             System.out.println("14. View All Room Rates");
+            System.out.println("15. Manually Allocate Rooms");
+            System.out.println("16. View Room Allocation Exception Report");
             System.out.println("99. Exit");
             response = 0;
 
@@ -118,11 +125,18 @@ public class HotelOperationModule {
                     doCreateNewRoomRate();
                 } else if (response == 11) {
                     doViewRoomRateDetails();
+                } else if (response == 12) {
+                    doUpdateRoomRate();
                 } else if (response == 13) {
                     doDeleteRoomRateRecord();
                 } else if (response == 14) {
                     doViewAllRoomRateRecords();
-                } else if (response == 99) {
+                } else if (response == 15) {
+                    doManuallyAllocateRooms();
+                } else if (response == 16) {
+                    doViewExceptionReport();
+                }
+                else if (response == 99) {
                     break;
                 } else {
                     System.out.println("Invalid input, try again!");
@@ -190,7 +204,7 @@ public class HotelOperationModule {
         System.out.println("Bed: " + roomType.getBedType());
         System.out.println("Capacity: " + roomType.getCapacity());
         System.out.println("Amenities: " + roomType.getAmenities());
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -247,7 +261,7 @@ public class HotelOperationModule {
         System.out.println("Capacity: " + newRoomType.getCapacity());
         System.out.println("Amenities: " + newRoomType.getAmenities());
 
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -282,7 +296,7 @@ public class HotelOperationModule {
             System.out.println("ID: " + rt.getId() + " | Name: " + rt.getName() + " | Ranking: " + rt.getRanking());
         }
 
-        System.out.println("\nPress any key to continue.");
+        System.out.println("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -351,7 +365,7 @@ public class HotelOperationModule {
         System.out.println("Room Type: " + newRoom.getRoomType().getName());
         System.out.println("Room Status: " + newRoom.getRoomStatus().name());
 
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -388,7 +402,7 @@ public class HotelOperationModule {
             System.out.println("ID: " + room.getId() + " | Number: " + room.getRoomNumber() + " | Status: " + room.getRoomStatus().name() + " | Type: " + room.getRoomType().getName());
         }
 
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -423,10 +437,18 @@ public class HotelOperationModule {
             if (rateType == 1 || rateType == 2) {
                 if (rateType == 1) {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PUBLISHED, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 } else {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.NORMAL, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 }
                 break;
 
@@ -452,10 +474,18 @@ public class HotelOperationModule {
 
                 if (rateType == 3) {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PEAK, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 } else {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PROMOTION, ratePerNight);
-                    roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    try {
+                        roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
+                    } catch (EntityIsDisabledException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 }
                 break;
             } else {
@@ -480,7 +510,7 @@ public class HotelOperationModule {
             System.out.println("Start Date: " + roomRate.getStartDate());
             System.out.println("End Date: " + roomRate.getEndDate());
         }
-        System.out.println("Press any key to continue.");
+        System.out.println("Press enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -521,11 +551,150 @@ public class HotelOperationModule {
 
         }
 
-        System.out.println("\nPress any key to continue.");
+        System.out.println("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doManuallyAllocateRooms() {
+        
+        System.out.println("\nManually allocating rooms:\n");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        
+        Date givenDate = null;
+        while (givenDate == null) {
+            System.out.print("Enter date for allocation (format: dd-MM-yyyy, e.g., 12-10-2002): ");
+            String startInput = sc.nextLine();
+            try {
+                givenDate = dateFormat.parse(startInput);
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use dd-MM-yyyy.");
+            }
+        }
+        //try {
+            roomAllocationSessionBeanRemote.allocateRoomsForDate(givenDate);
+            System.out.println("Rooms allocated successfully!");
+       // } catch (){
+
+       // }
+    }
+
+    private void doUpdateRoomRate() {
+        
+        System.out.println("\nUpdate Room Rate Details: ");
+        doViewAllRoomRateRecords();
+        System.out.print("Enter ID Of Room Rate to Update> ");
+        int roomRateId = sc.nextInt();
+        sc.nextLine();
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        
+        RoomRateEntity roomRate = roomRateEntitySessionBeanRemote.retrieveRoomRate(roomRateId);
+        System.out.println("1. Room rate Name: " + roomRate.getName());
+        System.out.println("2. Rate per night: $" + roomRate.getRatePerNight());
+        System.out.println("3. Rate Type: " + roomRate.getRateType() + " (cannot change)");
+        System.out.println("4. Room Type: " + roomRate.getRoomType().getName()+ " (cannot change)");
+        if (roomRate.getStartDate() != null && roomRate.getEndDate() != null) {
+            System.out.println("5. Start Date: " + roomRate.getStartDate());
+            System.out.println("6. End Date: " + roomRate.getEndDate());
+        }
+        
+        while (true) {
+            System.out.print("Select choice of update> ");
+            int command = sc.nextInt();
+            sc.nextLine();
+            if (command == 4) {
+                System.out.println("Cannot change room type, please select again.");
+            } else if (command == 3) {
+                System.out.println("Cannot change rate type, please select again.");;
+            } else if (command == 1) {
+                System.out.print("Input New Name> ");;
+                String newName = sc.nextLine().trim();
+                roomRate.setName(newName);
+                break;
+            } else if (command == 2) {
+                System.out.print("Input New Rate per night> $");
+                BigDecimal newRatePerNight = sc.nextBigDecimal();
+                sc.nextLine();
+                roomRate.setRatePerNight(newRatePerNight);
+                break;
+            } else if (command == 5) {
+                if (roomRate.getRateType() == RateType.NORMAL || roomRate.getRateType() == RateType.PUBLISHED) {
+                    System.out.println("Cannot set validity period for published or normal rates, please select again.");
+                } else {
+                    System.out.print("Enter the new starting date (dd-MM-yyyy)> ");
+                    String inputDate = sc.nextLine().trim();
+                    Date startDate = null;
+                    try {
+                        startDate = dateFormat.parse(inputDate);
+                        if (startDate.after(roomRate.getEndDate())) {
+                            System.out.println("Start date must be before the end date.");
+                        } else {
+                            roomRate.setStartDate(startDate);
+                            break;
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else if (command == 6) {
+                if (roomRate.getRateType() == RateType.NORMAL || roomRate.getRateType() == RateType.PUBLISHED) {
+                    System.out.println("Cannot set validity period for published or normal rates, please select again.");
+                } else {
+                    System.out.print("Enter the new ending date (dd-MM-yyyy)> ");
+                    String inputDate = sc.nextLine().trim();
+                    Date endDate = null;
+                    try {
+                        endDate = dateFormat.parse(inputDate);
+                        if (endDate.before(roomRate.getStartDate())) {
+                            System.out.println("End date must be after the start date.");
+                        } else {
+                            roomRate.setEndDate(endDate);
+                            break;
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        
+        RoomRateEntity newRoomRate = roomRateEntitySessionBeanRemote.updateRoomRate(roomRate);
+        System.out.println("\nRoom Rate Updated With Details: ");
+        System.out.println("1. Room rate Name: " + newRoomRate.getName());
+        System.out.println("2. Rate per night: $" + newRoomRate.getRatePerNight());
+        System.out.println("3. Rate Type: " + newRoomRate.getRateType());
+        System.out.println("4. Room Type: " + newRoomRate.getRoomType().getName());
+        if (newRoomRate.getStartDate() != null && newRoomRate.getEndDate() != null) {
+            System.out.println("5. Start Date: " + newRoomRate.getStartDate());
+            System.out.println("6. End Date: " + newRoomRate.getEndDate());
+        }
+
+        System.out.println("Press enter to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doViewExceptionReport() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date currentDate = calendar.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd yyyy");
+        List<AllocationExceptionEntity> allocationExceptions = allocationExceptionEntitySessionBeanRemote.getExceptionReportsForDate(currentDate);
+        System.out.println("Number of exceptions for " + df.format(currentDate) + ": " + allocationExceptions.size());
+        for (AllocationExceptionEntity ae : allocationExceptions) {
+            System.out.println(ae.getMessage());
         }
     }
 

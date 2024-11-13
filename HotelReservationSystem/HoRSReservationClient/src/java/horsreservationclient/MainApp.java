@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UserAlreadyRegisteredException;
 
 /**
  *
@@ -156,8 +157,12 @@ public class MainApp {
         passportNum = sc.nextLine().trim();
         
         GuestEntity newGuest = new GuestEntity(username, passportNum, password);
-        long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
-        System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
+        try {
+            long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
+            System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
+        } catch (UserAlreadyRegisteredException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     private void doSearchHotelRoom() {
@@ -198,7 +203,7 @@ public class MainApp {
             System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
                 System.out.print("\nName: " + roomType.getName());
-                System.out.println(" Room Description: " + roomType.getDescription());
+                System.out.println(" | Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
                 System.out.println("Capacity: " + roomType.getCapacity());
@@ -206,11 +211,11 @@ public class MainApp {
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-                System.out.println(" Available Quantity: " + quantity);
+                System.out.println(" | Available Quantity: " + quantity);
             }
         }
         
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {

@@ -5,9 +5,11 @@
 package ejb.session.stateless;
 
 import entities.GuestEntity;
+import entities.UnregisteredGuestEntity;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UserAlreadyRegisteredException;
 
 /**
  *
@@ -16,12 +18,12 @@ import util.exception.InvalidLoginCredentialException;
 @Local
 public interface GuestEntitySessionBeanLocal {
 
-    public long createNewGuest(GuestEntity newGuest);
+    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException;
 
     public GuestEntity retrieveGuestByUsername(String username);
 
     public GuestEntity guestLogin(String username, String password) throws InvalidLoginCredentialException;
 
-    public List<GuestEntity> retrieveGuestByPassportNo(String passportNo);
+    public List<UnregisteredGuestEntity> retrieveGuestByPassportNo(String passportNo);
 
 }

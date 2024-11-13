@@ -5,12 +5,14 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,7 +55,10 @@ public class RoomEntity implements Serializable {
     private RoomTypeEntity roomType;
     
     @OneToMany(mappedBy = "allocatedRoom")
-    private List<ReservationRoomEntity> reservationRooms;
+    private List<ReservationRoomEntity> reservationRooms = new ArrayList<>();
+    
+    @OneToOne(fetch = FetchType.EAGER)
+    private ReservationRoomEntity mostRecentReservation;
     
     public RoomEntity() {
     }
@@ -135,6 +140,14 @@ public class RoomEntity implements Serializable {
 
     public void setReservationRooms(List<ReservationRoomEntity> reservationRooms) {
         this.reservationRooms = reservationRooms;
+    }
+
+    public ReservationRoomEntity getMostRecentReservation() {
+        return mostRecentReservation;
+    }
+
+    public void setMostRecentReservation(ReservationRoomEntity mostRecentReservation) {
+        this.mostRecentReservation = mostRecentReservation;
     }
     
 }

@@ -5,6 +5,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,7 +23,8 @@ import javax.persistence.OneToOne;
  */
 @Entity
 @NamedQueries ({
-    @NamedQuery(name = "findActiveRoomTypes", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE")
+    @NamedQuery(name = "findActiveRoomTypes", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE"),
+    @NamedQuery(name = "findUpgradedRoomType", query = "SELECT rt from RoomTypeEntity rt WHERE rt.disabled = FALSE AND rt.ranking = :givenRanking")
 })
 public class RoomTypeEntity implements Serializable {
 
@@ -30,7 +32,7 @@ public class RoomTypeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = false, length = 32)
     private String name;
     @Column(nullable = false)
     private String description;
@@ -48,7 +50,7 @@ public class RoomTypeEntity implements Serializable {
     private boolean disabled;
     
     @OneToMany(mappedBy = "roomType")
-    private List<RoomRateEntity> allRates;
+    private List<RoomRateEntity> allRates = new ArrayList<>();
     
     @OneToOne()   
     private RoomRateEntity normalRate;
@@ -57,10 +59,10 @@ public class RoomTypeEntity implements Serializable {
     private RoomRateEntity publishedRate;
     
     @OneToMany (mappedBy = "roomType")
-    private List<RoomEntity> rooms;
+    private List<RoomEntity> rooms = new ArrayList<>();
     
     @OneToMany(mappedBy = "roomType")
-    private List<ReservationEntity> reservations;
+    private List<ReservationEntity> reservations = new ArrayList<>();
     
     public RoomTypeEntity() {
         this.disabled = false;

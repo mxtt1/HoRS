@@ -4,16 +4,22 @@
  */
 package horsmanagementclient;
 
+import ejb.session.singleton.RoomAllocationSessionBeanRemote;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.PartnerEntitySessionBeanRemote;
+import ejb.session.stateless.ReservationEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import entities.EmployeeEntity;
 import entities.PartnerEntity;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import util.enums.EmployeeRole;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -27,6 +33,7 @@ public class SystemAdminModule {
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
+    private RoomAllocationSessionBeanRemote allocationSessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
     
@@ -38,12 +45,13 @@ public class SystemAdminModule {
 
     public SystemAdminModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote,
             RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity) {
+            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomAllocationSessionBeanRemote allocationSessionBeanRemote) {
         this();
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
+        this.allocationSessionBeanRemote = allocationSessionBeanRemote;
     }
 
     public void menuSystemAdmin() throws InvalidAccessRightException {
@@ -146,7 +154,7 @@ public class SystemAdminModule {
             System.out.println("ID: " + e.getId() + " Full Name: " + e.getFullName()
                     + " Username: " + e.getUsername() + " Password: " + e.getPassword());
         }
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -178,12 +186,37 @@ public class SystemAdminModule {
         for (PartnerEntity p : partners) {
             System.out.println("ID: " + p.getPartnerEntityId() + " Username: " + p.getUsername());
         }
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
             Logger.getLogger(SystemAdminModule.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    /*
+    private void doManuallyAllocateRooms() {
+        System.out.println("\nManually allocating rooms:\n");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        
+        Date givenDate = null;
+        while (givenDate == null) {
+            System.out.print("Enter date for allocation (format: dd-MM-yyyy, e.g., 12-10-2002): ");
+            String startInput = sc.nextLine();
+            try {
+                givenDate = dateFormat.parse(startInput);
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use dd-MM-yyyy.");
+            }
+        }
+        //try {
+            allocationSessionBeanRemote.allocateRoomsForDate(givenDate);
+            System.out.println("Rooms allocated successfully!");
+       // } catch (){
+
+       // }
+    }
+*/
 
 }

@@ -14,26 +14,31 @@ import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.EmployeeEntity;
 import entities.GuestEntity;
 import entities.ReservationEntity;
+import entities.ReservationRoomEntity;
 import entities.RoomTypeEntity;
 import entities.UnregisteredGuestEntity;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.ejb.EJB;
 import javax.persistence.NoResultException;
 import util.enums.EmployeeRole;
+import util.enums.RoomStatus;
 import util.exception.InvalidAccessRightException;
 
 /**
  *
  * @author Mark
  */
-class GuestRelationModule {
+class FrontOfficeModule {
 
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
@@ -42,16 +47,16 @@ class GuestRelationModule {
     private GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
     private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
-    
+
     private static Scanner sc = new Scanner(System.in);
 
     private EmployeeEntity currentEmployeeEntity;
 
-    public GuestRelationModule() {
+    public FrontOfficeModule() {
 
     }
 
-    GuestRelationModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
+    FrontOfficeModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
             RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currentEmployeeEntity,
             RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, GuestEntitySessionBeanRemote guestEntitySessionBeanRemote,
             UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
@@ -86,15 +91,15 @@ class GuestRelationModule {
                 System.out.print("> ");
                 response = sc.nextInt();
                 sc.nextLine();
-                
+
                 if (response == 1) {
-                     doWalkInSearchRoom();
+                    doWalkInSearchRoom();
                 } else if (response == 2) {
                     doReserveHotelRoom();
                 } else if (response == 3) {
                     doCheckInGuest();
                 } else if (response == 4) {
-
+                    doCheckOutGuest();
                 } else if (response == 5) {
                     break;
                 } else {
@@ -157,7 +162,7 @@ class GuestRelationModule {
             }
         }
 
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -190,7 +195,7 @@ class GuestRelationModule {
             }
         }
 
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -199,9 +204,7 @@ class GuestRelationModule {
         return true;
     }
 
-    private void doCheckInGuest() {
-        System.out.println("");
-    }
+    
 
     private void doReserveHotelRoom() {
 
@@ -253,23 +256,23 @@ class GuestRelationModule {
                 System.out.print("Input guest's passport number> ");
                 String passportNo = sc.nextLine().trim();
                 long guestId = -1;
-                List<GuestEntity> guests = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNo);
+                List<UnregisteredGuestEntity> guests = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNo);
                 if (guests.size() == 0) {
                     guestId = unregisteredGuestEntitySessionBeanRemote.createNewUnregisteredGuest(new UnregisteredGuestEntity(passportNo));
                 } else {
                     guestId = guests.get(0).getId();
                 }
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-                long id = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
+                long newReservationId = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
 
                 Date now = new Date();
-                long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
-                long startOfToday = now.getTime() - timePastMidnight;
-                long twoAM = startOfToday + (2 * 60 * 60 * 1000);
+                Date reservationStart = newReservation.getStartDate();
+                boolean isPast2AM = now.getHours() >= 2;
 
                 // check same day and past 2am
-                if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
-                    // ALLOCATE ROOM
+                if (now.getYear() == reservationStart.getYear() && now.getMonth() == reservationStart.getMonth()
+                        && now.getDate() == reservationStart.getDate() && isPast2AM) {
+                    reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
                 }
 
                 System.out.println("Reservation Successful!");
@@ -281,4 +284,70 @@ class GuestRelationModule {
         }
 
     }
+    
+    private void doCheckInGuest() {
+        UnregisteredGuestEntity guest = null;
+        while (guest == null) {
+            System.out.println("Input guest passport number: ");
+            String passportNum = sc.nextLine().trim();
+            guest = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNum).get(0);
+            if (guest == null) {
+                System.out.println("No guests associated with inputted passport number.");
+            }
+        }
+        
+        List<ReservationEntity> reservations = reservationEntitySessionBeanRemote.retrieveAllReservationsForGuest(guest.getId());
+        
+        Date currentDate = new Date();
+        reservations = reservations.stream()
+                .filter(reservation -> 
+                        !currentDate.before(reservation.getStartDate()) &&
+                        !currentDate.after(reservation.getEndDate()))
+                .collect(Collectors.toList());
+        if (reservations.size() == 0) {
+            System.out.println("No reservations found");
+            return;
+        }
+        for (ReservationEntity reservation : reservations) {
+            List<ReservationRoomEntity> reservationRooms = reservation.getReservationRooms();
+            for (ReservationRoomEntity reservationRoom : reservationRooms) {
+                if (reservationRoom.getAllocatedRoom() == null) {
+                    //
+                } else {
+                    reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.OCCUPIED);
+                    roomEntitySessionBeanRemote.updateRoom(reservationRoom.getAllocatedRoom());
+                    System.out.println("Room " + reservationRoom.getAllocatedRoom().getRoomNumber() + " checked in");
+                }
+            }
+        }
+
+    }
+
+    private void doCheckOutGuest() {
+        Date currentDate = new Date();
+        UnregisteredGuestEntity guest = null;
+        while (guest == null) {
+            System.out.println("Input guest passport number: ");
+            String passportNum = sc.nextLine().trim();
+            guest = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNum).get(0);
+            if (guest == null) {
+                System.out.println("No guests associated with inputted passport number.");
+            }
+        }
+        
+        List<ReservationEntity> reservations = reservationEntitySessionBeanRemote.retrieveAllReservationsForGuest(guest.getId());
+        reservations = reservations.stream().filter(reservation -> !currentDate.after(reservation.getEndDate())).collect(Collectors.toList());
+        for (ReservationEntity reservation : reservations) {
+            List<ReservationRoomEntity> reservationRooms = reservation.getReservationRooms();
+            for (ReservationRoomEntity reservationRoom : reservationRooms) {
+                if (reservationRoom.getAllocatedRoom() != null && reservationRoom.getAllocatedRoom().getRoomStatus().equals(RoomStatus.OCCUPIED)) {
+                    reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.AVAILABLE);
+                    roomEntitySessionBeanRemote.updateRoom(reservationRoom.getAllocatedRoom());
+                    System.out.println("Room " + reservationRoom.getAllocatedRoom().getRoomNumber() + " checked out");
+                }
+            }
+        }
+    }
+    
+    
 }

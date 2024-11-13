@@ -14,7 +14,6 @@ import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.GuestEntity;
 import entities.ReservationEntity;
 import entities.RoomTypeEntity;
-import entities.UnregisteredGuestEntity;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -64,7 +63,9 @@ class GuestModule {
             System.out.println("\nHoRS System :: Reservation Client");
             System.out.println("1. Search Hotel Room");
             System.out.println("2. Reserve Hotel Room");
-            System.out.println("99. Exit");
+            System.out.println("3. View My Reservation Details");
+            System.out.println("4. View All My Reservations");
+            System.out.println("99. Logout");
             response = 0;
 
             while (response < 1 || response > 99) {
@@ -75,6 +76,10 @@ class GuestModule {
                     doSearchHotelRoom();
                 } else if (response == 2) {
                     doReserveHotelRoom();
+                } else if (response == 3) {
+                    doViewMyReservationDetails();
+                } else if (response == 4) {
+                    doViewAllGuestReservations();
                 } else if (response == 99) {
                     break;
                 } else {
@@ -124,20 +129,20 @@ class GuestModule {
         } else {
             System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("Name: " + roomType.getName());
-                System.out.println(" Room Description: " + roomType.getDescription());
+                System.out.print("\nName: " + roomType.getName());
+                System.out.println(" | Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
                 System.out.println("Capacity: " + roomType.getCapacity());
                 System.out.println("Amenities: " + roomType.getAmenities());
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
-                System.out.print(" Price: $" + cost);
+                System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-                System.out.println(" Available Quantity: " + quantity);
+                System.out.println(" | Available Quantity: " + quantity);
             }
         }
 
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -156,8 +161,8 @@ class GuestModule {
         } else {
             System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("Name: " + roomType.getName());
-                System.out.println(" Room Description: " + roomType.getDescription());
+                System.out.print("\nName: " + roomType.getName());
+                System.out.println(" | Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
                 System.out.println("Capacity: " + roomType.getCapacity());
@@ -165,11 +170,11 @@ class GuestModule {
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
                 System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-                System.out.println(" Available Quantity: " + quantity);
+                System.out.println(" | Available Quantity: " + quantity);
             }
         }
 
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {
@@ -228,16 +233,16 @@ class GuestModule {
                 sc.nextLine();
                 long guestId = currentGuestEntity.getId();
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-                long id = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
+                long newReservationId = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
 
                 Date now = new Date();
-                long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
-                long startOfToday = now.getTime() - timePastMidnight;
-                long twoAM = startOfToday + (2 * 60 * 60 * 1000);
+                Date reservationStart = newReservation.getStartDate();
+                boolean isPast2AM = now.getHours() >= 2;
 
                 // check same day and past 2am
-                if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
-                    // ALLOCATE ROOM
+                if (now.getYear() == reservationStart.getYear() && now.getMonth() == reservationStart.getMonth()
+                        && now.getDate() == reservationStart.getDate() && isPast2AM) {
+                    reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
                 }
 
                 System.out.println("Reservation Successful!");
@@ -247,6 +252,50 @@ class GuestModule {
             }
         } else {
             return;
+        }
+    }
+
+    private void doViewAllGuestReservations() {
+         System.out.println("\nViewing All Reservations:\n");
+        List<ReservationEntity> reservations = reservationEntitySessionBeanRemote.retrieveAllReservationsForGuest(this.currentGuestEntity.getId());
+
+        for (ReservationEntity re : reservations) {
+            String output = "ID: " + re.getId() + " | Check-in Date: " + re.getStartDate() + " | Check-out Date: " + re.getEndDate()
+                    + " | Room Type: " + re.getRoomType().getName();
+            System.out.println(output);
+        }
+
+        System.out.println("\nPress enter to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(GuestModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doViewMyReservationDetails() {
+        doViewAllGuestReservations();
+        
+        System.out.print("Enter ID of reservation to view details> ");
+        long reservationId = sc.nextInt();
+        sc.nextLine();
+        ReservationEntity reservation = reservationEntitySessionBeanRemote.retrieveReservation(reservationId);
+
+        if (reservation.getOccupant().getPassportNum().equals(this.currentGuestEntity.getPassportNum())) {
+            System.out.println("Room Type: " + reservation.getRoomType().getName());
+            System.out.println("Check-in Date: " + reservation.getStartDate());
+            System.out.println("Check-out Date: " + reservation.getEndDate());
+            System.out.println("Total Fee: $" + reservation.getFee());
+            System.out.println("Number of Rooms: " + reservation.getQuantity());
+            System.out.println("Press enter to continue.");
+            try {
+                System.in.read();
+            } catch (IOException ex) {
+                Logger.getLogger(GuestModule.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            System.out.println("Error: Reservation ID does not exist, please try again!");
         }
     }
 }
