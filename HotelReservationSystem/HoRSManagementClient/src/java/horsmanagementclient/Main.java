@@ -5,6 +5,7 @@
 package horsmanagementclient;
 
 import ejb.session.singleton.RoomAllocationSessionBeanRemote;
+import ejb.session.stateless.AllocationExceptionEntitySessionBeanRemote;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.GuestEntitySessionBeanRemote;
 import ejb.session.stateless.PartnerEntitySessionBeanRemote;
@@ -22,6 +23,9 @@ import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
  * @author mattl
  */
 public class Main {
+
+    @EJB(name = "AllocationExceptionEntitySessionBeanRemote")
+    private static AllocationExceptionEntitySessionBeanRemote allocationExceptionEntitySessionBeanRemote;
 
     @EJB(name = "RoomAllocationSessionBeanRemote")
     private static RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote;
@@ -55,7 +59,7 @@ public class Main {
     public static void main(String[] args) throws InvalidLoginCredentialException, InvalidAccessRightException {
         MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote,
                 partnerEntitySessionBeanRemote, roomEntitySessionBean, roomRateEntitySessionBean, guestEntitySessionBeanRemote,
-                unregisteredGuestEntitySessionBeanRemote, reservationEntitySessionBeanRemote, roomAllocationSessionBeanRemote);
+                unregisteredGuestEntitySessionBeanRemote, reservationEntitySessionBeanRemote, roomAllocationSessionBeanRemote, allocationExceptionEntitySessionBeanRemote);
         mainApp.runApp();
     }
 

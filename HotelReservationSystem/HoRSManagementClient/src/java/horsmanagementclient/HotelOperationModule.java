@@ -5,10 +5,12 @@
 package horsmanagementclient;
 
 import ejb.session.singleton.RoomAllocationSessionBeanRemote;
+import ejb.session.stateless.AllocationExceptionEntitySessionBeanRemote;
 import ejb.session.stateless.EmployeeEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
+import entities.AllocationExceptionEntity;
 import entities.EmployeeEntity;
 import entities.RoomEntity;
 import entities.RoomRateEntity;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -41,6 +44,7 @@ public class HotelOperationModule {
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
     private RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote;
+    private AllocationExceptionEntitySessionBeanRemote allocationExceptionEntitySessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
     
@@ -53,7 +57,8 @@ public class HotelOperationModule {
     }
 
     public HotelOperationModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, EmployeeEntity currEmployeeEntity, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, RoomAllocationSessionBeanRemote roomAllocationSessionBeanRemote,
+            AllocationExceptionEntitySessionBeanRemote allocationExceptionEntitySessionBeanRemote) {
         this();
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
@@ -61,6 +66,7 @@ public class HotelOperationModule {
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.currentEmployeeEntity = currEmployeeEntity;
         this.roomAllocationSessionBeanRemote = roomAllocationSessionBeanRemote;
+        this.allocationExceptionEntitySessionBeanRemote = allocationExceptionEntitySessionBeanRemote;
     }
 
     public void menuHotelOperation() throws InvalidAccessRightException {
@@ -88,6 +94,7 @@ public class HotelOperationModule {
             System.out.println("13. Delete Room Rate");
             System.out.println("14. View All Room Rates");
             System.out.println("15. Manually Allocate Rooms");
+            System.out.println("16. View Room Allocation Exception Report");
             System.out.println("99. Exit");
             response = 0;
 
@@ -126,6 +133,8 @@ public class HotelOperationModule {
                     doViewAllRoomRateRecords();
                 } else if (response == 15) {
                     doManuallyAllocateRooms();
+                } else if (response == 16) {
+                    doViewExceptionReport();
                 }
                 else if (response == 99) {
                     break;
@@ -671,6 +680,21 @@ public class HotelOperationModule {
             System.in.read();
         } catch (IOException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doViewExceptionReport() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date currentDate = calendar.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd yyyy");
+        List<AllocationExceptionEntity> allocationExceptions = allocationExceptionEntitySessionBeanRemote.getExceptionReportsForDate(currentDate);
+        System.out.println("Number of exceptions for " + df.format(currentDate) + ": " + allocationExceptions.size());
+        for (AllocationExceptionEntity ae : allocationExceptions) {
+            System.out.println(ae.getMessage());
         }
     }
 
