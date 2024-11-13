@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UserAlreadyRegisteredException;
 
 /**
  *
@@ -25,14 +26,14 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     private EntityManager em;
 
     @Override
-    public long createNewGuest(GuestEntity newGuest) {
+    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException {
         List<UnregisteredGuestEntity> duplicate = em.createQuery("SELECT g FROM UnregisteredGuestEntity g WHERE g.passportNum = :passportNum")
                 .setParameter("passportNum", newGuest.getPassportNum())
                 .getResultList();
         String passportNum = newGuest.getPassportNum();
         newGuest.setPassportNum("TEMPORARY");
                 
-        if (!duplicate.isEmpty()) {
+        if (!duplicate.isEmpty() && !(duplicate.get(0) instanceof GuestEntity)) { // if there exists a UNREGISTERED guest with same passport number
             UnregisteredGuestEntity guestToDelete = duplicate.get(0);
             List<ReservationEntity> reservations =  guestToDelete.getReservations();
             
@@ -45,7 +46,9 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
             em.persist(newGuest);
             em.flush();
             newGuest.setPassportNum(passportNum);
-        } else {
+        } else if (!duplicate.isEmpty() && duplicate.get(0) instanceof GuestEntity) {
+            throw new UserAlreadyRegisteredException("Error: User has already been registered. Please log in instead.");
+        } else { //
             em.persist(newGuest);
             em.flush();
         }

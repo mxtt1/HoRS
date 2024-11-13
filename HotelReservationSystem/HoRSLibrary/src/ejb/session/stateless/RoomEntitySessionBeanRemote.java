@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entities.RoomEntity;
 import entities.RoomTypeEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import javax.persistence.NoResultException;
@@ -32,5 +33,5 @@ public interface RoomEntitySessionBeanRemote {
 
     public RoomEntity changeRoomType(long roomId, String newRoomTypeName);
 
-    List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId);
+    public List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId, Date givenDate);
 }

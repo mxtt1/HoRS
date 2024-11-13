@@ -143,13 +143,14 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         ReservationEntity reservationToAllocate = em.find(ReservationEntity.class, reservationId);
         RoomTypeEntity roomTypeToAllocate = reservationToAllocate.getRoomType();
         for (ReservationRoomEntity rr : reservationToAllocate.getReservationRooms()) {
-            List<RoomEntity> availableRooms = roomEntitySessionBean.findUnassignedRoomsForRoomType(roomTypeToAllocate.getId());
+            List<RoomEntity> availableRooms = roomEntitySessionBean.findUnassignedRoomsForRoomType(roomTypeToAllocate.getId(), reservationToAllocate.getStartDate());
 
             if (!availableRooms.isEmpty() && rr.getAllocatedRoom() == null) { // there is an available unassigned room
                 RoomEntity roomToAllocate = availableRooms.get(0);
                 roomToAllocate.getReservationRooms().add(rr);
                 rr.setAllocatedRoom(roomToAllocate);
-                roomToAllocate.setRoomStatus(RoomStatus.ASSIGNED);
+                if (roomToAllocate.getRoomStatus() != RoomStatus.OCCUPIED) roomToAllocate.setRoomStatus(RoomStatus.ASSIGNED);
+                roomToAllocate.setMostRecentReservation(rr);
             } else if (roomTypeToAllocate.getRanking() == 1 && rr.getAllocatedRoom() == null) { // no available roosm of original room type and no better room type  
                 String exceptionMessage = "Unable to assign room of type " + roomTypeToAllocate.getName()
                         + " for reservation made by guest with passport number "
@@ -161,13 +162,14 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
             } else if(rr.getAllocatedRoom() == null) { // check the better room type
                 RoomTypeEntity upgradedRoomType = em.createNamedQuery("findUpgradedRoomType", RoomTypeEntity.class)
                         .setParameter("givenRanking", roomTypeToAllocate.getRanking() - 1).getSingleResult();
-                availableRooms = roomEntitySessionBean.findUnassignedRoomsForRoomType(upgradedRoomType.getId());
+                availableRooms = roomEntitySessionBean.findUnassignedRoomsForRoomType(upgradedRoomType.getId(), reservationToAllocate.getStartDate());
 
                 if (!availableRooms.isEmpty()) {
                     RoomEntity roomToAllocate = availableRooms.get(0);
                     roomToAllocate.getReservationRooms().add(rr);
                     rr.setAllocatedRoom(roomToAllocate);
-                    roomToAllocate.setRoomStatus(RoomStatus.ASSIGNED);
+                    if (roomToAllocate.getRoomStatus() != RoomStatus.OCCUPIED) roomToAllocate.setRoomStatus(RoomStatus.ASSIGNED);
+                    roomToAllocate.setMostRecentReservation(rr);
                     String exceptionMessage = "Automatically assigned room of upgraded type " + upgradedRoomType.getName()
                             + " for reservation made by guest with passport number "
                             + reservationToAllocate.getOccupant().getPassportNum() + " starting on " + reservationToAllocate.getStartDate();

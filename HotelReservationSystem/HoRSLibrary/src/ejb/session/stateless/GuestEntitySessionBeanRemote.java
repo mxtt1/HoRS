@@ -9,6 +9,7 @@ import entities.UnregisteredGuestEntity;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UserAlreadyRegisteredException;
 
 /**
  *
@@ -17,7 +18,7 @@ import util.exception.InvalidLoginCredentialException;
 @Remote
 public interface GuestEntitySessionBeanRemote {
 
-    public long createNewGuest(GuestEntity newGuest);
+    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException;
     
     public GuestEntity retrieveGuestByUsername(String username);
     

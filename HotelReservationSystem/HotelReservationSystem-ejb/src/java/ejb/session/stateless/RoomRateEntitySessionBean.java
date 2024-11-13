@@ -129,5 +129,17 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
                 .setParameter("peakRate", RateType.PEAK)
                 .getResultList();
     }
+
+    @Override
+    public RoomRateEntity retrieveRoomRate(long roomRateId) {
+        return em.find(RoomRateEntity.class, roomRateId);
+    }
+
+    @Override
+    public RoomRateEntity updateRoomRate(RoomRateEntity newRoomRate) {
+        em.merge(newRoomRate);
+        em.flush();
+        return newRoomRate;
+    }
     
 }

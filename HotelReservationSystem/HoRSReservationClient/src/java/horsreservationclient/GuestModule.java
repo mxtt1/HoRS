@@ -236,12 +236,12 @@ class GuestModule {
                 long newReservationId = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
 
                 Date now = new Date();
-                long timePastMidnight = now.getTime() % (24 * 60 * 60 * 1000);
-                long startOfToday = now.getTime() - timePastMidnight;
-                long twoAM = startOfToday + (2 * 60 * 60 * 1000);
+                Date reservationStart = newReservation.getStartDate();
+                boolean isPast2AM = now.getHours() >= 2;
 
                 // check same day and past 2am
-                if (startDate.getTime() >= twoAM && startDate.getTime() < startOfToday + (24 * 60 * 60 * 1000)) {
+                if (now.getYear() == reservationStart.getYear() && now.getMonth() == reservationStart.getMonth()
+                        && now.getDate() == reservationStart.getDate() && isPast2AM) {
                     reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
                 }
 

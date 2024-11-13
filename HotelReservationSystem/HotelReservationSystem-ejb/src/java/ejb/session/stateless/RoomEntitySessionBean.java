@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entities.RoomEntity;
 import entities.RoomTypeEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -114,10 +115,34 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     }
 
     @Override
-    public List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId) {
-        TypedQuery<RoomEntity> query = em.createQuery("SELECT r FROM RoomEntity r WHERE r.disabled = false AND r.roomStatus = :roomStatus AND r.roomType.id = :roomTypeId", RoomEntity.class);
-        query.setParameter("roomStatus", RoomStatus.AVAILABLE).setParameter("roomTypeId", roomTypeId);
-        return query.getResultList();
+    public List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId, Date givenDate) {
+       
+        TypedQuery<RoomEntity> queryNoReservation = em.createQuery(
+                "SELECT r FROM RoomEntity r "
+                + "WHERE r.disabled = false "
+                + "AND r.roomType.id = :roomTypeId "
+                + "AND r.mostRecentReservation IS NULL",
+                RoomEntity.class
+        );
+        queryNoReservation.setParameter("roomTypeId", roomTypeId);
+        List<RoomEntity> roomsNoReservation = queryNoReservation.getResultList();
+
+
+        TypedQuery<RoomEntity> queryWithEndDate = em.createQuery(
+                "SELECT r FROM RoomEntity r "
+                + "WHERE r.disabled = false "
+                + "AND r.roomType.id = :roomTypeId "
+                + "AND r.mostRecentReservation IS NOT NULL "
+                + "AND r.mostRecentReservation.reservation.endDate <= :givenDate",
+                RoomEntity.class
+        );
+        queryWithEndDate.setParameter("roomTypeId", roomTypeId);
+        queryWithEndDate.setParameter("givenDate", givenDate);
+        List<RoomEntity> roomsWithEndDate = queryWithEndDate.getResultList();
+
+        roomsNoReservation.addAll(roomsWithEndDate);
+        return roomsNoReservation;
+
     }
 
 }

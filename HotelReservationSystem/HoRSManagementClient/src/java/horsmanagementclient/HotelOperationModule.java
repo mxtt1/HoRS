@@ -84,6 +84,7 @@ public class HotelOperationModule {
             System.out.println("9. View All Rooms");
             System.out.println("10. Create New Room Rate");
             System.out.println("11. View Room Rate Details");
+            System.out.println("12. Update Room Rate");
             System.out.println("13. Delete Room Rate");
             System.out.println("14. View All Room Rates");
             System.out.println("15. Manually Allocate Rooms");
@@ -117,6 +118,8 @@ public class HotelOperationModule {
                     doCreateNewRoomRate();
                 } else if (response == 11) {
                     doViewRoomRateDetails();
+                } else if (response == 12) {
+                    doUpdateRoomRate();
                 } else if (response == 13) {
                     doDeleteRoomRateRecord();
                 } else if (response == 14) {
@@ -456,9 +459,6 @@ public class HotelOperationModule {
                 Date endDate = null;
                 try {
                     endDate = dateFormat.parse(secondInputDate);
-                    if (endDate.before(startDate)) {
-                        System.out.println("End date must be after the start date.");
-                    }
                 } catch (ParseException ex) {
                     Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -551,6 +551,7 @@ public class HotelOperationModule {
     }
 
     private void doManuallyAllocateRooms() {
+        
         System.out.println("\nManually allocating rooms:\n");
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
@@ -571,6 +572,106 @@ public class HotelOperationModule {
        // } catch (){
 
        // }
+    }
+
+    private void doUpdateRoomRate() {
+        
+        System.out.println("\nUpdate Room Rate Details: ");
+        doViewAllRoomRateRecords();
+        System.out.print("Enter ID Of Room Rate to Update> ");
+        int roomRateId = sc.nextInt();
+        sc.nextLine();
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        
+        RoomRateEntity roomRate = roomRateEntitySessionBeanRemote.retrieveRoomRate(roomRateId);
+        System.out.println("1. Room rate Name: " + roomRate.getName());
+        System.out.println("2. Rate per night: $" + roomRate.getRatePerNight());
+        System.out.println("3. Rate Type: " + roomRate.getRateType() + " (cannot change)");
+        System.out.println("4. Room Type: " + roomRate.getRoomType().getName()+ " (cannot change)");
+        if (roomRate.getStartDate() != null && roomRate.getEndDate() != null) {
+            System.out.println("5. Start Date: " + roomRate.getStartDate());
+            System.out.println("6. End Date: " + roomRate.getEndDate());
+        }
+        
+        while (true) {
+            System.out.print("Select choice of update> ");
+            int command = sc.nextInt();
+            sc.nextLine();
+            if (command == 4) {
+                System.out.println("Cannot change room type, please select again.");
+            } else if (command == 3) {
+                System.out.println("Cannot change rate type, please select again.");;
+            } else if (command == 1) {
+                System.out.print("Input New Name> ");;
+                String newName = sc.nextLine().trim();
+                roomRate.setName(newName);
+                break;
+            } else if (command == 2) {
+                System.out.print("Input New Rate per night> $");
+                BigDecimal newRatePerNight = sc.nextBigDecimal();
+                sc.nextLine();
+                roomRate.setRatePerNight(newRatePerNight);
+                break;
+            } else if (command == 5) {
+                if (roomRate.getRateType() == RateType.NORMAL || roomRate.getRateType() == RateType.PUBLISHED) {
+                    System.out.println("Cannot set validity period for published or normal rates, please select again.");
+                } else {
+                    System.out.print("Enter the new starting date (dd-MM-yyyy)> ");
+                    String inputDate = sc.nextLine().trim();
+                    Date startDate = null;
+                    try {
+                        startDate = dateFormat.parse(inputDate);
+                        if (startDate.after(roomRate.getEndDate())) {
+                            System.out.println("Start date must be before the end date.");
+                        } else {
+                            roomRate.setStartDate(startDate);
+                            break;
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else if (command == 6) {
+                if (roomRate.getRateType() == RateType.NORMAL || roomRate.getRateType() == RateType.PUBLISHED) {
+                    System.out.println("Cannot set validity period for published or normal rates, please select again.");
+                } else {
+                    System.out.print("Enter the new ending date (dd-MM-yyyy)> ");
+                    String inputDate = sc.nextLine().trim();
+                    Date endDate = null;
+                    try {
+                        endDate = dateFormat.parse(inputDate);
+                        if (endDate.before(roomRate.getStartDate())) {
+                            System.out.println("End date must be after the start date.");
+                        } else {
+                            roomRate.setEndDate(endDate);
+                            break;
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        
+        RoomRateEntity newRoomRate = roomRateEntitySessionBeanRemote.updateRoomRate(roomRate);
+        System.out.println("\nRoom Rate Updated With Details: ");
+        System.out.println("1. Room rate Name: " + newRoomRate.getName());
+        System.out.println("2. Rate per night: $" + newRoomRate.getRatePerNight());
+        System.out.println("3. Rate Type: " + newRoomRate.getRateType());
+        System.out.println("4. Room Type: " + newRoomRate.getRoomType().getName());
+        if (newRoomRate.getStartDate() != null && newRoomRate.getEndDate() != null) {
+            System.out.println("5. Start Date: " + newRoomRate.getStartDate());
+            System.out.println("6. End Date: " + newRoomRate.getEndDate());
+        }
+
+        System.out.println("Press enter to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
