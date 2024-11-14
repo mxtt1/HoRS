@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
 
 /**
  *
@@ -17,7 +18,7 @@ import javax.ejb.Remote;
 @Remote
 public interface RoomTypeEntitySessionBeanRemote {
 
-    long createNewRoomType(RoomTypeEntity newRoomType);
+    long createNewRoomType(RoomTypeEntity newRoomType)throws InputDataValidationException;
 
     List<RoomTypeEntity> retrieveAllRoomTypes();
 
@@ -27,7 +28,7 @@ public interface RoomTypeEntitySessionBeanRemote {
 
     public RoomTypeEntity retrieveRoomTypeByName(String roomTypeName);
 
-    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType);
+    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType)throws InputDataValidationException;
 
     public List<RoomTypeEntity> getAvailableRoomTypes(Date startDate, Date endDate);
 

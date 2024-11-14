@@ -13,6 +13,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -22,9 +24,13 @@ import javax.persistence.OneToMany;
 public class GuestEntity extends UnregisteredGuestEntity implements Serializable {
 
     @Column(nullable = false, unique = true, length = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String name;
     
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 8, max = 32)
     private String password;
     
     @OneToMany(mappedBy = "booker")

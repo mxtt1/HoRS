@@ -21,6 +21,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -36,16 +41,27 @@ public class ReservationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.DATE)
+    @NotNull
+    @FutureOrPresent
     private Date startDate;
+    
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.DATE)
+    @NotNull
+    @Future
     private Date endDate;
+    
     @Column(nullable = false)
+    @NotNull
+    @Min(1)
     private int quantity;
     
     @Column(precision = 16, scale = 2, nullable = false)
+    @NotNull
+    @DecimalMin("0.00")
     private BigDecimal fee;
     
     @ManyToOne(optional = true)

@@ -16,6 +16,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -32,21 +35,40 @@ public class RoomTypeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 32)
+    
+    @Column(nullable = false, length = 32, unique = true)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String name;
+    
     @Column(nullable = false)
+    @NotNull
     private String description;
+    
     @Column(nullable = false)
+    @NotNull
     private int roomSize;
+    
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(max = 32)
     private String bedType;
+    
     @Column(nullable = false)
+    @NotNull
+    @Min(1)
     private int capacity;
-    @Column()
+    
+    @Column(nullable = false)
+    @NotNull
     private String amenities;
+    
     @Column(nullable = false)
+    @NotNull
     private int ranking;
+    
     @Column(nullable = false)
+    @NotNull
     private boolean disabled;
     
     @OneToMany(mappedBy = "roomType")

@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entities.GuestEntity;
 import entities.ReservationEntity;
 import entities.RoomRateEntity;
 import entities.RoomTypeEntity;
@@ -11,12 +12,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import util.exception.InputDataValidationException;
 
 /**
  *
@@ -33,6 +39,9 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
+    
+    @Inject
+    private Validator validator;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
@@ -95,10 +104,15 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public long createNewRoomType(RoomTypeEntity newRoomType) {
-        em.persist(newRoomType);
-        em.flush();
-        return newRoomType.getId();
+    public long createNewRoomType(RoomTypeEntity newRoomType) throws InputDataValidationException{
+        Set<ConstraintViolation<RoomTypeEntity>> constraintViolations = validator.validate(newRoomType);
+        if (constraintViolations.isEmpty()) {
+            em.persist(newRoomType);
+            em.flush();
+            return newRoomType.getId();
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
@@ -164,10 +178,15 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType) {
-        em.merge(roomType);
-        em.flush();
-        return roomType;
+    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType) throws InputDataValidationException{
+        Set<ConstraintViolation<RoomTypeEntity>> constraintViolations = validator.validate(roomType);
+        if (constraintViolations.isEmpty()) {
+            em.merge(roomType);
+            em.flush();
+            return roomType;
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
@@ -187,4 +206,13 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         return Math.max(totalRooms - bookedRooms, 0);
     }
 
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RoomTypeEntity>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
 }

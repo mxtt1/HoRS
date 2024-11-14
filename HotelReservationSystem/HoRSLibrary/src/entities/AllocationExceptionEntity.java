@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -24,11 +25,15 @@ public class AllocationExceptionEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @Column(nullable = false)
+    @NotNull
     private boolean resolved;
+    
     @Column(nullable = false)
+    @NotNull
     private String message;
-
+    
     @OneToOne(optional = false) 
     @JoinColumn(nullable = false)
     private ReservationRoomEntity reservationRoom;

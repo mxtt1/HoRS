@@ -23,6 +23,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enums.RoomStatus;
 
 /**
@@ -41,13 +43,17 @@ public class RoomEntity implements Serializable {
     private Long id;
     
     @Column(length = 4, nullable = false, unique = true)
+    @NotNull
+    @Size(min = 4, max = 4)
     private String roomNumber;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull
     private RoomStatus roomStatus;
     
     @Column(nullable = false)
+    @NotNull
     private boolean disabled;
     
     @ManyToOne(optional = false)

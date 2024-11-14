@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entities.ReservationEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
 
 /**
  *
@@ -15,9 +16,9 @@ import javax.ejb.Remote;
 @Remote
 public interface ReservationEntitySessionBeanRemote {
 
-    long createNewOnlineReservation(ReservationEntity newReservation, long bookerId, long roomTypeId);
+    long createNewOnlineReservation(ReservationEntity newReservation, long bookerId, long roomTypeId)throws InputDataValidationException;
 
-    public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId);
+    public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId) throws InputDataValidationException;
 
     void allocateRoomsToReservation(long reservationId);
 

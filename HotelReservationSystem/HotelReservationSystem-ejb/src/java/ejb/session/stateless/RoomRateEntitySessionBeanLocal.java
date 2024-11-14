@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.EntityIsDisabledException;
+import util.exception.InputDataValidationException;
 
 /**
  *
@@ -20,9 +21,9 @@ public interface RoomRateEntitySessionBeanLocal {
 
     void deleteRoomRate(long roomRateId);
     
-    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType)throws EntityIsDisabledException;
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType)throws EntityIsDisabledException, InputDataValidationException;
 
-    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType)throws EntityIsDisabledException;
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType)throws EntityIsDisabledException, InputDataValidationException;
 
     public List<RoomRateEntity> retrieveAllRoomRates();
 
@@ -31,7 +32,5 @@ public interface RoomRateEntitySessionBeanLocal {
     public List<RoomRateEntity> retrieveApplicablePeakRates(RoomTypeEntity roomType, Date date);
 
     RoomRateEntity retrieveRoomRate(long roomRateId);
-
-    RoomRateEntity updateRoomRate(RoomRateEntity newRoomRate);
     
 }

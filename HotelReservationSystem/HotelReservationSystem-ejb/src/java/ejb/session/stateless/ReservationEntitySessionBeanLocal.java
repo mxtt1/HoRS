@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entities.ReservationEntity;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
 
 /**
  *
@@ -14,9 +15,9 @@ import javax.ejb.Local;
 @Local
 public interface ReservationEntitySessionBeanLocal {
 
-    long createNewOnlineReservation(ReservationEntity newReservation, long bookerId, long roomTypeId );
+    long createNewOnlineReservation(ReservationEntity newReservation, long bookerId, long roomTypeId)throws InputDataValidationException;
 
-    public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId);
+    public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId) throws InputDataValidationException;
 
     void allocateRoomsToReservation(long reservationId);
     

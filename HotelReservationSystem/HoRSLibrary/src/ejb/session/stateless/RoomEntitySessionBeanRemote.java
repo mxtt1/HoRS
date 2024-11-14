@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ejb.Remote;
 import javax.persistence.NoResultException;
 import util.exception.EntityIsDisabledException;
+import util.exception.InputDataValidationException;
 
 /**
  *
@@ -19,7 +20,7 @@ import util.exception.EntityIsDisabledException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException;
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException, InputDataValidationException;
 
     public List<RoomEntity> retrieveAllRooms();
 
@@ -29,7 +30,7 @@ public interface RoomEntitySessionBeanRemote {
     
     public RoomEntity retrieveRoomByNumber(String roomNum) throws NoResultException;
     
-    public RoomEntity updateRoom(RoomEntity room);
+    public RoomEntity updateRoom(RoomEntity room) throws InputDataValidationException;
 
     public RoomEntity changeRoomType(long roomId, String newRoomTypeName);
 

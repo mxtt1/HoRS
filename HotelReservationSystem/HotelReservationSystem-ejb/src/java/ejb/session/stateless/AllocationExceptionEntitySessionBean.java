@@ -20,7 +20,7 @@ public class AllocationExceptionEntitySessionBean implements AllocationException
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
-
+    
     @Override
     public List<AllocationExceptionEntity> getExceptionReportsForDate(Date date) {
         return em.createQuery("SELECT ae FROM AllocationExceptionEntity ae WHERE ae.reservationRoom.reservation.startDate = :currentDate", AllocationExceptionEntity.class)

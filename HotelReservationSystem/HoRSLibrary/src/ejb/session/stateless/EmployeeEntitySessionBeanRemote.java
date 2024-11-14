@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entities.EmployeeEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -16,7 +17,7 @@ import util.exception.InvalidLoginCredentialException;
 @Remote
 public interface EmployeeEntitySessionBeanRemote {
 
-    long createNewEmployee(EmployeeEntity newEmployee);
+    long createNewEmployee(EmployeeEntity newEmployee)throws InputDataValidationException;
 
     List<EmployeeEntity> retrieveAllEmployees();
 

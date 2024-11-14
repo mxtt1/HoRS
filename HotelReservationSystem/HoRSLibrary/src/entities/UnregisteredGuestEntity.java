@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -30,6 +31,7 @@ public class UnregisteredGuestEntity implements Serializable {
     private Long id; 
     
     @Column(nullable = false, unique = true)
+    @NotNull
     private String passportNum;
     
     @OneToMany(mappedBy = "occupant")

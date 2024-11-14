@@ -4,14 +4,20 @@
  */
 package ejb.session.stateless;
 
+import entities.EmployeeEntity;
 import entities.GuestEntity;
 import entities.ReservationEntity;
 import entities.UnregisteredGuestEntity;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.UserAlreadyRegisteredException;
 
@@ -24,35 +30,43 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
+    
+    @Inject
+    private Validator validator;
 
     @Override
-    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException {
-        List<UnregisteredGuestEntity> duplicate = em.createQuery("SELECT g FROM UnregisteredGuestEntity g WHERE g.passportNum = :passportNum")
-                .setParameter("passportNum", newGuest.getPassportNum())
-                .getResultList();
-                
-        if (!duplicate.isEmpty() && !(duplicate.get(0) instanceof GuestEntity)) { // if there exists a UNREGISTERED guest with same passport number
-            UnregisteredGuestEntity guestToDelete = duplicate.get(0);
-            List<ReservationEntity> reservations = guestToDelete.getReservations();
-            String passportNum = newGuest.getPassportNum();
-            newGuest.setPassportNum("TEMPORARY");
+    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException, InputDataValidationException{
+        Set<ConstraintViolation<GuestEntity>> constraintViolations = validator.validate(newGuest);
+        if (constraintViolations.isEmpty()) {
+            List<UnregisteredGuestEntity> duplicate = em.createQuery("SELECT g FROM UnregisteredGuestEntity g WHERE g.passportNum = :passportNum")
+                    .setParameter("passportNum", newGuest.getPassportNum())
+                    .getResultList();
 
-            for (ReservationEntity re : reservations) {
-                re.setOccupant(newGuest);
+            if (!duplicate.isEmpty() && !(duplicate.get(0) instanceof GuestEntity)) { // if there exists a UNREGISTERED guest with same passport number
+                UnregisteredGuestEntity guestToDelete = duplicate.get(0);
+                List<ReservationEntity> reservations = guestToDelete.getReservations();
+                String passportNum = newGuest.getPassportNum();
+                newGuest.setPassportNum("TEMPORARY");
+
+                for (ReservationEntity re : reservations) {
+                    re.setOccupant(newGuest);
+                }
+                newGuest.getReservations().addAll(reservations);
+                guestToDelete.getReservations().clear();
+                em.remove(guestToDelete);
+                em.persist(newGuest);
+                em.flush();
+                newGuest.setPassportNum(passportNum);
+            } else if (!duplicate.isEmpty() && duplicate.get(0) instanceof GuestEntity) {
+                throw new UserAlreadyRegisteredException("Error: User has already been registered. Please log in instead.");
+            } else { //
+                em.persist(newGuest);
+                em.flush();
             }
-            newGuest.getReservations().addAll(reservations);
-            guestToDelete.getReservations().clear();
-            em.remove(guestToDelete);
-            em.persist(newGuest);
-            em.flush();
-            newGuest.setPassportNum(passportNum);
-        } else if (!duplicate.isEmpty() && duplicate.get(0) instanceof GuestEntity) {
-            throw new UserAlreadyRegisteredException("Error: User has already been registered. Please log in instead.");
-        } else { //
-            em.persist(newGuest);
-            em.flush();
+            return newGuest.getId();
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
-        return newGuest.getId();
     }
     
     @Override
@@ -85,4 +99,15 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
         return guests;
     }
     
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<GuestEntity>>constraintViolations)
+    {
+        String msg = "Input data validation error!:";
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+        
+        return msg;
+    }
 }

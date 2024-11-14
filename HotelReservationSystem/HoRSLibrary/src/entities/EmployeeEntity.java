@@ -15,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enums.EmployeeRole;
 
 /**
@@ -28,14 +30,25 @@ public class EmployeeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull
     private EmployeeRole employeeRole;
+    
     @Column(nullable = false, unique = true, length = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String username;
+    
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String password;
+    
     @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(max = 64)
     private String fullName;
     
     @OneToMany(mappedBy = "employee")

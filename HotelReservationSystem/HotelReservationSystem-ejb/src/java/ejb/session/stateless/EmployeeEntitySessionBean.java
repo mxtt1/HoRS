@@ -6,10 +6,15 @@ package ejb.session.stateless;
 
 import entities.EmployeeEntity;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -22,15 +27,21 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-    
+    @Inject
+    private Validator validator;
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
 
     @Override
-    public long createNewEmployee(EmployeeEntity newEmployee) {
-        em.persist(newEmployee);
-        em.flush();
-        return newEmployee.getId();
+    public long createNewEmployee(EmployeeEntity newEmployee) throws InputDataValidationException{
+        Set<ConstraintViolation<EmployeeEntity>> constraintViolations = validator.validate(newEmployee);
+        if (constraintViolations.isEmpty()) {
+            em.persist(newEmployee);
+            em.flush();
+            return newEmployee.getId();
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
@@ -61,5 +72,16 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
         }
     }
     
-    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<EmployeeEntity>>constraintViolations)
+    {
+        String msg = "Input data validation error!:";
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+        
+        return msg;
+    }
+
 }

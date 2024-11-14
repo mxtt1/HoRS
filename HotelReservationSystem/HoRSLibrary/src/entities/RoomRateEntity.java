@@ -23,6 +23,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enums.RateType;
 
 /**
@@ -42,19 +46,32 @@ public class RoomRateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 32)
+    
+    @Column(nullable = false, length = 32, unique = true)
+    @NotNull
+    @Size(max = 32)
     private String name;
+    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private RateType rateType;
+   
     @Column(nullable = false, precision = 16, scale = 2)
+    @NotNull
+    @DecimalMin("0.00")
     private BigDecimal ratePerNight;
+    
     @Column(nullable = false)
+    @NotNull
     private boolean disabled;
     
     @Temporal(javax.persistence.TemporalType.DATE)
+    @FutureOrPresent
     private Date startDate;
+    
     @Temporal(javax.persistence.TemporalType.DATE)
+    @FutureOrPresent
     private Date endDate;
     
     @ManyToOne(optional = false)

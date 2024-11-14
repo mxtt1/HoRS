@@ -8,6 +8,7 @@ import entities.GuestEntity;
 import entities.UnregisteredGuestEntity;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.UserAlreadyRegisteredException;
 
@@ -18,7 +19,7 @@ import util.exception.UserAlreadyRegisteredException;
 @Local
 public interface GuestEntitySessionBeanLocal {
 
-    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException;
+    public long createNewGuest(GuestEntity newGuest) throws UserAlreadyRegisteredException, InputDataValidationException;
 
     public GuestEntity retrieveGuestByUsername(String username);
 
