@@ -277,8 +277,6 @@ class FrontOfficeModule {
                 }
 
                 System.out.println("Reservation Successful!");
-            } catch (NoResultException e) {
-                System.out.println(e.getMessage());
             } catch (UnknownPersistenceException upe) {
                 System.out.println(upe.getMessage());
             } catch (AlreadyExistsException aee) {

@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UnknownPersistenceException;
 import util.exception.UserAlreadyRegisteredException;
 
 /**
@@ -163,6 +165,10 @@ public class MainApp {
             System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
         } catch (UserAlreadyRegisteredException | InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");
+        } catch (AlreadyExistsException aee) {
+            System.out.println(aee.getMessage());
+        } catch (UnknownPersistenceException upe) {
+            System.out.println(upe.getMessage());
         }
     }
 

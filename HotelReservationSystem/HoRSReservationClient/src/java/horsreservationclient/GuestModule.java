@@ -233,22 +233,21 @@ class GuestModule {
                 long newReservationId = 0l;
                 try {
                     newReservationId = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
+                
+                    Date now = new Date();
+                    Date reservationStart = newReservation.getStartDate();
+                    boolean isPast2AM = now.getHours() >= 2;
+
+                    // check same day and past 2am
+                    if (now.getYear() == reservationStart.getYear() && now.getMonth() == reservationStart.getMonth()
+                            && now.getDate() == reservationStart.getDate() && isPast2AM) {
+                        reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
+                    }
+
+                    System.out.println("Reservation Successful!");
                 } catch (InputDataValidationException ex) {
                     System.out.println(ex.getMessage() + "\n");
                 }
-
-                Date now = new Date();
-                Date reservationStart = newReservation.getStartDate();
-                boolean isPast2AM = now.getHours() >= 2;
-
-                // check same day and past 2am
-                if (now.getYear() == reservationStart.getYear() && now.getMonth() == reservationStart.getMonth()
-                        && now.getDate() == reservationStart.getDate() && isPast2AM) {
-                    reservationEntitySessionBeanRemote.allocateRoomsToReservation(newReservationId);
-                }
-
-                System.out.println("Reservation Successful!");
-
             } catch (NoResultException e) {
                 System.out.println(e.getMessage());
             }
