@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import util.enums.EmployeeRole;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -139,9 +140,13 @@ public class SystemAdminModule {
             }
         }
         if (username.length() > 0 && password.length() > 0 && fullname.length() > 0) {
-            EmployeeEntity newEmployee = new EmployeeEntity(employeeRole, username, password, fullname);
-            long id = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
-            System.out.println("New employee with id " + id + " and role " + employeeRole.toString() + " created successfully");
+            try {
+                EmployeeEntity newEmployee = new EmployeeEntity(employeeRole, username, password, fullname);
+                long id = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
+                System.out.println("New employee with id " + id + " and role " + employeeRole.toString() + " created successfully");
+            } catch (InputDataValidationException ex) {
+                System.out.println(ex.getMessage() + "\n");
+            }
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }

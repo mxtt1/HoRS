@@ -32,6 +32,7 @@ import javax.ejb.EJB;
 import javax.persistence.NoResultException;
 import util.enums.EmployeeRole;
 import util.enums.RoomStatus;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 
 /**
@@ -263,7 +264,12 @@ class FrontOfficeModule {
                     guestId = guests.get(0).getId();
                 }
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-                long newReservationId = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
+                long newReservationId = 0l;
+                try {
+                    newReservationId = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
+                } catch (InputDataValidationException ex) {
+                    System.out.println(ex.getMessage() + "\n");
+                }
 
                 Date now = new Date();
                 Date reservationStart = newReservation.getStartDate();
@@ -315,9 +321,13 @@ class FrontOfficeModule {
                 if (reservationRoom.getAllocatedRoom() == null) {
                     //
                 } else {
-                    reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.OCCUPIED);
-                    roomEntitySessionBeanRemote.updateRoom(reservationRoom.getAllocatedRoom());
-                    System.out.println("Room " + reservationRoom.getAllocatedRoom().getRoomNumber() + " checked in");
+                    try {
+                        reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.OCCUPIED);
+                        roomEntitySessionBeanRemote.updateRoom(reservationRoom.getAllocatedRoom());
+                        System.out.println("Room " + reservationRoom.getAllocatedRoom().getRoomNumber() + " checked in");
+                    } catch (InputDataValidationException ex) {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
             }
         }
@@ -343,9 +353,13 @@ class FrontOfficeModule {
             List<ReservationRoomEntity> reservationRooms = reservation.getReservationRooms();
             for (ReservationRoomEntity reservationRoom : reservationRooms) {
                 if (reservationRoom.getAllocatedRoom() != null && reservationRoom.getAllocatedRoom().getRoomStatus().equals(RoomStatus.OCCUPIED)) {
-                    reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.AVAILABLE);
-                    roomEntitySessionBeanRemote.updateRoom(reservationRoom.getAllocatedRoom());
-                    System.out.println("Room " + reservationRoom.getAllocatedRoom().getRoomNumber() + " checked out");
+                    try {
+                        reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.AVAILABLE);
+                        roomEntitySessionBeanRemote.updateRoom(reservationRoom.getAllocatedRoom());
+                        System.out.println("Room " + reservationRoom.getAllocatedRoom().getRoomNumber() + " checked out");
+                    } catch (InputDataValidationException ex) {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
             }
         }

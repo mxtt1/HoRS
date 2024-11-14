@@ -24,6 +24,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.NoResultException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 
 /**
@@ -229,7 +230,12 @@ class GuestModule {
                 sc.nextLine();
                 long guestId = currentGuestEntity.getId();
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
-                long newReservationId = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
+                long newReservationId = 0l;
+                try {
+                    newReservationId = reservationEntitySessionBeanRemote.createNewOnlineReservation(newReservation, guestId, roomType.getId());
+                } catch (InputDataValidationException ex) {
+                    System.out.println(ex.getMessage() + "\n");
+                }
 
                 Date now = new Date();
                 Date reservationStart = newReservation.getStartDate();

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.UserAlreadyRegisteredException;
@@ -160,8 +161,8 @@ public class MainApp {
         try {
             long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
             System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
-        } catch (UserAlreadyRegisteredException ex) {
-            System.out.println(ex.getMessage());
+        } catch (UserAlreadyRegisteredException | InputDataValidationException ex) {
+            System.out.println(ex.getMessage() + "\n");
         }
     }
 
