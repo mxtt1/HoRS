@@ -7,8 +7,10 @@ package ejb.session.stateless;
 import entities.EmployeeEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -17,7 +19,7 @@ import util.exception.InvalidLoginCredentialException;
 @Remote
 public interface EmployeeEntitySessionBeanRemote {
 
-    long createNewEmployee(EmployeeEntity newEmployee)throws InputDataValidationException;
+    public long createNewEmployee(EmployeeEntity newEmployee) throws InputDataValidationException, AlreadyExistsException, UnknownPersistenceException;
 
     List<EmployeeEntity> retrieveAllEmployees();
 

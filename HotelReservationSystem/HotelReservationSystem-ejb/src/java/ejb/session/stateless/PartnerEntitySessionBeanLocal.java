@@ -7,6 +7,8 @@ package ejb.session.stateless;
 import entities.PartnerEntity;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.AlreadyExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -15,7 +17,7 @@ import javax.ejb.Local;
 @Local
 public interface PartnerEntitySessionBeanLocal {
 
-    public long createNewPartner(PartnerEntity newPartner);
+    public long createNewPartner(PartnerEntity newPartner) throws AlreadyExistsException, UnknownPersistenceException;
 
     public List<PartnerEntity> retrieveAllPartners();
     

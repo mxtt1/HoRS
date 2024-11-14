@@ -32,8 +32,10 @@ import javax.ejb.EJB;
 import javax.persistence.NoResultException;
 import util.enums.EmployeeRole;
 import util.enums.RoomStatus;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -284,6 +286,10 @@ class FrontOfficeModule {
                 System.out.println("Reservation Successful!");
             } catch (NoResultException e) {
                 System.out.println(e.getMessage());
+            } catch (UnknownPersistenceException upe) {
+                System.out.println(upe.getMessage());
+            } catch (AlreadyExistsException aee) {
+                System.out.println(aee.getMessage());
             }
         } else {
             return;

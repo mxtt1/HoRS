@@ -25,8 +25,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import util.enums.EmployeeRole;
 import util.enums.RateType;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -126,6 +128,10 @@ public class DataInitSessionBean {
             
         } catch (InputDataValidationException ex) {
             System.out.println(ex.getMessage());
+        } catch (AlreadyExistsException aee) {
+            System.out.println(aee.getMessage());
+        } catch (UnknownPersistenceException upe) {
+            System.out.println(upe.getMessage());
         }
         
     }   

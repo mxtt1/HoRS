@@ -20,9 +20,12 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -39,7 +42,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
-    
+
     @Inject
     private Validator validator;
 
@@ -86,15 +89,13 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
 
         return totalCost;
     }
-    
-    
 
     @Override
     public BigDecimal getPublishedRateForDates(RoomTypeEntity roomType, Date startDate, Date endDate) {
         Date currentDate = startDate;
         BigDecimal totalCost = BigDecimal.ZERO;
         RoomRateEntity applicableRate = roomType.getPublishedRate();
-       
+
         while (currentDate.before(endDate)) {
             totalCost = totalCost.add(applicableRate.getRatePerNight());
             currentDate = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24));
@@ -104,14 +105,24 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public long createNewRoomType(RoomTypeEntity newRoomType) throws InputDataValidationException{
-        Set<ConstraintViolation<RoomTypeEntity>> constraintViolations = validator.validate(newRoomType);
-        if (constraintViolations.isEmpty()) {
-            em.persist(newRoomType);
-            em.flush();
-            return newRoomType.getId();
-        } else {
-            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+    public long createNewRoomType(RoomTypeEntity newRoomType) throws InputDataValidationException, UnknownPersistenceException, AlreadyExistsException {
+        try {
+            Set<ConstraintViolation<RoomTypeEntity>> constraintViolations = validator.validate(newRoomType);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newRoomType);
+                em.flush();
+                return newRoomType.getId();
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new AlreadyExistsException("Room Type already exists");
+                }
+            }
+            throw new UnknownPersistenceException(ex.getMessage());
+
         }
     }
 
@@ -178,7 +189,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     }
 
     @Override
-    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType) throws InputDataValidationException{
+    public RoomTypeEntity updateRoomType(RoomTypeEntity roomType) throws InputDataValidationException {
         Set<ConstraintViolation<RoomTypeEntity>> constraintViolations = validator.validate(roomType);
         if (constraintViolations.isEmpty()) {
             em.merge(roomType);

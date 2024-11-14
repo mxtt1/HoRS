@@ -6,6 +6,8 @@ package ejb.session.stateless;
 
 import entities.UnregisteredGuestEntity;
 import javax.ejb.Local;
+import util.exception.AlreadyExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -14,6 +16,6 @@ import javax.ejb.Local;
 @Local
 public interface UnregisteredGuestEntitySessionBeanLocal {
 
-    public long createNewUnregisteredGuest(UnregisteredGuestEntity newUnregisteredGuest);
+    public long createNewUnregisteredGuest(UnregisteredGuestEntity newUnregisteredGuest) throws UnknownPersistenceException, AlreadyExistsException;
     
 }

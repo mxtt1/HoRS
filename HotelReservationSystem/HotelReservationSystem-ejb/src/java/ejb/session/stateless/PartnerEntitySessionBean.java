@@ -9,6 +9,9 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import util.exception.AlreadyExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -21,10 +24,20 @@ public class PartnerEntitySessionBean implements PartnerEntitySessionBeanRemote,
     private EntityManager em;
 
     @Override
-    public long createNewPartner(PartnerEntity newPartner) {
+    public long createNewPartner(PartnerEntity newPartner) throws AlreadyExistsException, UnknownPersistenceException {
+        try {
         em.persist(newPartner);
         em.flush();
         return newPartner.getPartnerEntityId();
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new AlreadyExistsException("Partner already exists");
+                }
+            }
+            throw new UnknownPersistenceException(ex.getMessage());
+
+        }
     }
     
     @Override

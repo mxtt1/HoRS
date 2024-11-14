@@ -21,9 +21,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import util.enums.EmployeeRole;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -146,6 +148,10 @@ public class SystemAdminModule {
                 System.out.println("New employee with id " + id + " and role " + employeeRole.toString() + " created successfully");
             } catch (InputDataValidationException ex) {
                 System.out.println(ex.getMessage() + "\n");
+            } catch (UnknownPersistenceException upe) {
+                System.out.println(upe.getMessage());
+            } catch (AlreadyExistsException aee) {
+                System.out.println(aee.getMessage());
             }
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
@@ -176,7 +182,8 @@ public class SystemAdminModule {
         username = sc.nextLine().trim();
         System.out.print("Enter password> ");
         password = sc.nextLine().trim();
-
+        
+        try {
         if (username.length() > 0 && password.length() > 0) {
             PartnerEntity newPartner = new PartnerEntity(username, password);
             long id = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
@@ -184,6 +191,11 @@ public class SystemAdminModule {
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
+        } catch (UnknownPersistenceException upe) {
+                System.out.println(upe.getMessage());
+            } catch (AlreadyExistsException aee) {
+                System.out.println(aee.getMessage());
+            }
     }
 
     private void doViewAllPartners() {

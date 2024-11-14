@@ -9,7 +9,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -18,7 +20,7 @@ import util.exception.InputDataValidationException;
 @Remote
 public interface RoomTypeEntitySessionBeanRemote {
 
-    long createNewRoomType(RoomTypeEntity newRoomType)throws InputDataValidationException;
+    public long createNewRoomType(RoomTypeEntity newRoomType) throws InputDataValidationException, UnknownPersistenceException, AlreadyExistsException;
 
     List<RoomTypeEntity> retrieveAllRoomTypes();
 

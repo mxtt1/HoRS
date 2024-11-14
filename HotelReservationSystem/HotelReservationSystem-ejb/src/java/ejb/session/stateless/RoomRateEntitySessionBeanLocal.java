@@ -9,8 +9,10 @@ import entities.RoomTypeEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -21,9 +23,9 @@ public interface RoomRateEntitySessionBeanLocal {
 
     void deleteRoomRate(long roomRateId);
     
-    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType)throws EntityIsDisabledException, InputDataValidationException;
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) throws EntityIsDisabledException, InputDataValidationException, AlreadyExistsException, UnknownPersistenceException;
 
-    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType)throws EntityIsDisabledException, InputDataValidationException;
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) throws EntityIsDisabledException, InputDataValidationException, AlreadyExistsException, UnknownPersistenceException;
 
     public List<RoomRateEntity> retrieveAllRoomRates();
 

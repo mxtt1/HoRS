@@ -16,11 +16,14 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import util.enums.RateType;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -41,66 +44,86 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     // "Insert Code > Add Business Method")
 
     @Override
-    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) throws EntityIsDisabledException, InputDataValidationException {
-        Set<ConstraintViolation<RoomRateEntity>> constraintViolations = validator.validate(newRoomRate);
-        if (constraintViolations.isEmpty()) {
-            RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) throws EntityIsDisabledException, InputDataValidationException, AlreadyExistsException, UnknownPersistenceException {
+        try {
+            Set<ConstraintViolation<RoomRateEntity>> constraintViolations = validator.validate(newRoomRate);
+            if (constraintViolations.isEmpty()) {
+                RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
 
-            newRoomRate.setRoomType(roomTypeToBeAssigned);
-            if (roomTypeToBeAssigned.isDisabled()) {
-                throw new EntityIsDisabledException("Error: room type is disabled!");
+                newRoomRate.setRoomType(roomTypeToBeAssigned);
+                if (roomTypeToBeAssigned.isDisabled()) {
+                    throw new EntityIsDisabledException("Error: room type is disabled!");
+                }
+                if (newRoomRate.getRateType() == RateType.NORMAL && roomTypeToBeAssigned.getNormalRate() == null) {
+                    roomTypeToBeAssigned.setNormalRate(newRoomRate);
+                    roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+                    em.persist(newRoomRate);
+                    em.flush();
+                    return newRoomRate.getId();
+                } else if (newRoomRate.getRateType() == RateType.NORMAL) {
+                    roomTypeToBeAssigned.getNormalRate().setRatePerNight(newRoomRate.getRatePerNight());
+                    return roomTypeToBeAssigned.getNormalRate().getId();
+                } else if (newRoomRate.getRateType() == RateType.PUBLISHED && roomTypeToBeAssigned.getPublishedRate() == null) {
+                    roomTypeToBeAssigned.setPublishedRate(newRoomRate);
+                    roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+                    em.persist(newRoomRate);
+                    em.flush();
+                    return newRoomRate.getId();
+                } else {
+                    roomTypeToBeAssigned.getPublishedRate().setRatePerNight(newRoomRate.getRatePerNight());
+                    return roomTypeToBeAssigned.getPublishedRate().getId();
+                }
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
-            if (newRoomRate.getRateType() == RateType.NORMAL && roomTypeToBeAssigned.getNormalRate() == null) {
-                roomTypeToBeAssigned.setNormalRate(newRoomRate);
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new AlreadyExistsException("Room rate already exists");
+                }
+            }
+            throw new UnknownPersistenceException(ex.getMessage());
+
+        }
+    }
+
+    @Override
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) throws EntityIsDisabledException, InputDataValidationException, AlreadyExistsException, UnknownPersistenceException {
+        try {
+            Set<ConstraintViolation<RoomRateEntity>> constraintViolations = validator.validate(newRoomRate);
+            if (constraintViolations.isEmpty()) {
+                RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
+                if (roomTypeToBeAssigned.isDisabled()) {
+                    throw new EntityIsDisabledException("Error: room type is disabled!");
+                }
+                newRoomRate.setRoomType(roomTypeToBeAssigned);
                 roomTypeToBeAssigned.getAllRates().add(newRoomRate);
-                em.persist(newRoomRate);
-                em.flush();
-                return newRoomRate.getId();
-            } else if (newRoomRate.getRateType() == RateType.NORMAL) {
-                roomTypeToBeAssigned.getNormalRate().setRatePerNight(newRoomRate.getRatePerNight());
-                return roomTypeToBeAssigned.getNormalRate().getId();
-            } else if (newRoomRate.getRateType() == RateType.PUBLISHED && roomTypeToBeAssigned.getPublishedRate() == null) {
-                roomTypeToBeAssigned.setPublishedRate(newRoomRate);
-                roomTypeToBeAssigned.getAllRates().add(newRoomRate);
+
+                newRoomRate.setStartDate(startDate);
+                newRoomRate.setEndDate(endDate);
+
                 em.persist(newRoomRate);
                 em.flush();
                 return newRoomRate.getId();
             } else {
-                roomTypeToBeAssigned.getPublishedRate().setRatePerNight(newRoomRate.getRatePerNight());
-                return roomTypeToBeAssigned.getPublishedRate().getId();
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
-        } else {
-            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new AlreadyExistsException("Room rate already exists");
+                }
+            }
+            throw new UnknownPersistenceException(ex.getMessage());
+
         }
     }
 
     @Override
-    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) throws EntityIsDisabledException, InputDataValidationException{
-        Set<ConstraintViolation<RoomRateEntity>> constraintViolations = validator.validate(newRoomRate);
-        if (constraintViolations.isEmpty()) {
-            RoomTypeEntity roomTypeToBeAssigned = roomTypeEntitySessionBean.retrieveRoomTypeByName(roomType);
-            if (roomTypeToBeAssigned.isDisabled()) {
-                throw new EntityIsDisabledException("Error: room type is disabled!");
-            }
-            newRoomRate.setRoomType(roomTypeToBeAssigned);
-            roomTypeToBeAssigned.getAllRates().add(newRoomRate);
-
-            newRoomRate.setStartDate(startDate);
-            newRoomRate.setEndDate(endDate);
-
-            em.persist(newRoomRate);
-            em.flush();
-            return newRoomRate.getId();
-        } else {
-            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
-        }
-    }
-
-    @Override
-    public RoomRateEntity retrieveRoomRateByName(String roomRateName) throws NoResultException{
-         RoomRateEntity roomRateEntity = em.createQuery("SELECT rr FROM RoomRateEntity rr WHERE rr.name = :roomRateName", RoomRateEntity.class)
-             .setParameter("roomRateName", roomRateName)
-             .getSingleResult();
+    public RoomRateEntity retrieveRoomRateByName(String roomRateName) throws NoResultException {
+        RoomRateEntity roomRateEntity = em.createQuery("SELECT rr FROM RoomRateEntity rr WHERE rr.name = :roomRateName", RoomRateEntity.class)
+                .setParameter("roomRateName", roomRateName)
+                .getSingleResult();
 
         return roomRateEntity;
     }
@@ -114,10 +137,10 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         } else if (roomRateToBeDeleted.getRoomType().getPublishedRate() == roomRateToBeDeleted) {
             roomRateToBeDeleted.getRoomType().setPublishedRate(null);
         }
-        
+
         if (roomRateToBeDeleted.getReservations().isEmpty()) {
-                    roomRateToBeDeleted.getRoomType().getAllRates().remove(roomRateToBeDeleted);
-                    em.remove(roomRateToBeDeleted);
+            roomRateToBeDeleted.getRoomType().getAllRates().remove(roomRateToBeDeleted);
+            em.remove(roomRateToBeDeleted);
         } else {
             roomRateToBeDeleted.setDisabled(true);
         }
@@ -152,7 +175,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     }
 
     @Override
-    public RoomRateEntity updateRoomRate(RoomRateEntity newRoomRate) throws InputDataValidationException{
+    public RoomRateEntity updateRoomRate(RoomRateEntity newRoomRate) throws InputDataValidationException {
         Set<ConstraintViolation<RoomRateEntity>> constraintViolations = validator.validate(newRoomRate);
         if (constraintViolations.isEmpty()) {
             em.merge(newRoomRate);
@@ -162,16 +185,14 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
-    
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RoomRateEntity>>constraintViolations)
-    {
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RoomRateEntity>> constraintViolations) {
         String msg = "Input data validation error!:";
-            
-        for(ConstraintViolation constraintViolation:constraintViolations)
-        {
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
             msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
         }
-        
+
         return msg;
     }
 }

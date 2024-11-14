@@ -31,8 +31,10 @@ import util.exception.InvalidAccessRightException;
 import util.RankingComparator;
 import util.enums.RateType;
 import util.enums.RoomStatus;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -48,7 +50,7 @@ public class HotelOperationModule {
     private AllocationExceptionEntitySessionBeanRemote allocationExceptionEntitySessionBeanRemote;
 
     private EmployeeEntity currentEmployeeEntity;
-    
+
     private static Scanner sc = new Scanner(System.in);
 
     private final RankingComparator rankingComparator = new RankingComparator();
@@ -175,12 +177,12 @@ public class HotelOperationModule {
             int capacity = sc.nextInt();
             System.out.print("Enter room size in square metres> ");
             int roomSize = sc.nextInt();
-            
+
             long newRoomTypeId = roomTypeEntitySessionBeanRemote.createNewRoomType(new RoomTypeEntity(name, description, bedType, amenities, capacity, roomSize));
-            
+
             List<RoomTypeEntity> allRoomTypes = roomTypeEntitySessionBeanRemote.retrieveAllRoomTypes();
             allRoomTypes.sort(rankingComparator);
-            
+
             System.out.println("\nRoom Hierarchy (1 is highest): ");
             for (RoomTypeEntity roomType : allRoomTypes) {
                 if (roomType.getRanking() != 0 && !roomType.isDisabled()) {
@@ -203,6 +205,10 @@ public class HotelOperationModule {
             }
         } catch (InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");;
+        } catch (UnknownPersistenceException upe) {
+            System.out.println(upe.getMessage());
+        } catch (AlreadyExistsException aee) {
+            System.out.println(aee.getMessage());
         }
     }
 
@@ -232,12 +238,12 @@ public class HotelOperationModule {
     private void doUpdateRoomTypeRecord() {
 
         try {
-            
+
             System.out.println("\nUpdate Room Type Details: ");
             doViewAllRoomTypeRecords();
             System.out.print("Enter Name Of Room Type to Update> ");
             String roomTypeName = sc.nextLine().trim();
-            
+
             RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
             System.out.println("1. Room Type Name: " + roomType.getName());
             System.out.println("2. Room Description: " + roomType.getDescription());
@@ -278,14 +284,14 @@ public class HotelOperationModule {
             System.out.println("Bed: " + newRoomType.getBedType());
             System.out.println("Capacity: " + newRoomType.getCapacity());
             System.out.println("Amenities: " + newRoomType.getAmenities());
-            
+
             System.out.println("Press enter to continue.");
             try {
                 System.in.read();
             } catch (IOException ex) {
                 Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         } catch (InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");
         }
@@ -293,7 +299,7 @@ public class HotelOperationModule {
     }
 
     private void doDeleteRoomTypeRecord() {
-        
+
         RoomTypeEntity roomTypeToBeDeleted = this.doViewRoomTypeDetails();
         System.out.print("Enter 'y' to confirm deletion> ");
         String response = sc.nextLine().trim().toLowerCase();
@@ -342,6 +348,10 @@ public class HotelOperationModule {
             System.out.println(ex.getMessage());
         } catch (NoResultException ex) {
             System.out.println("Error: No such room type!");
+        } catch (UnknownPersistenceException upe) {
+            System.out.println(upe.getMessage());
+        } catch (AlreadyExistsException aee) {
+            System.out.println(aee.getMessage());
         }
     }
 
@@ -470,6 +480,10 @@ public class HotelOperationModule {
                         roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
                     } catch (EntityIsDisabledException | InputDataValidationException ex) {
                         System.out.println(ex.getMessage() + "\n");
+                    } catch (UnknownPersistenceException upe) {
+                        System.out.println(upe.getMessage());
+                    } catch (AlreadyExistsException aee) {
+                        System.out.println(aee.getMessage());
                     }
                 } else {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.NORMAL, ratePerNight);
@@ -477,6 +491,10 @@ public class HotelOperationModule {
                         roomRateEntitySessionBeanRemote.createNewPublishedNormalRate(newRoomRate, roomType);
                     } catch (EntityIsDisabledException | InputDataValidationException ex) {
                         System.out.println(ex.getMessage() + "\n");
+                    } catch (UnknownPersistenceException upe) {
+                        System.out.println(upe.getMessage());
+                    } catch (AlreadyExistsException aee) {
+                        System.out.println(aee.getMessage());
                     }
                 }
                 break;
@@ -507,6 +525,10 @@ public class HotelOperationModule {
                         roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
                     } catch (EntityIsDisabledException | InputDataValidationException ex) {
                         System.out.println(ex.getMessage() + "\n");
+                    } catch (UnknownPersistenceException upe) {
+                        System.out.println(upe.getMessage());
+                    } catch (AlreadyExistsException aee) {
+                        System.out.println(aee.getMessage());
                     }
                 } else {
                     RoomRateEntity newRoomRate = new RoomRateEntity(roomRateName, RateType.PROMOTION, ratePerNight);
@@ -514,6 +536,10 @@ public class HotelOperationModule {
                         roomRateEntitySessionBeanRemote.createNewPeakPromotionRate(newRoomRate, startDate, endDate, roomType);
                     } catch (EntityIsDisabledException | InputDataValidationException ex) {
                         System.out.println(ex.getMessage() + "\n");
+                    } catch (UnknownPersistenceException upe) {
+                        System.out.println(upe.getMessage());
+                    } catch (AlreadyExistsException aee) {
+                        System.out.println(aee.getMessage());
                     }
                 }
                 break;
@@ -564,7 +590,7 @@ public class HotelOperationModule {
     }
 
     private void doViewAllRoomRateRecords() {
-  
+
         System.out.println("\nViewing All Room Rate Records:\n");
         List<RoomRateEntity> roomRates = roomRateEntitySessionBeanRemote.retrieveAllRoomRates();
 
@@ -590,11 +616,11 @@ public class HotelOperationModule {
     }
 
     private void doManuallyAllocateRooms() {
-        
+
         System.out.println("\nManually allocating rooms:\n");
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
-        
+
         Date givenDate = null;
         while (givenDate == null) {
             System.out.print("Enter date for allocation (format: dd-MM-yyyy, e.g., 12-10-2002): ");
@@ -606,36 +632,36 @@ public class HotelOperationModule {
             }
         }
         //try {
-            roomAllocationSessionBeanRemote.allocateRoomsForDate(givenDate);
-            System.out.println("Rooms allocated successfully!");
-       // } catch (){
+        roomAllocationSessionBeanRemote.allocateRoomsForDate(givenDate);
+        System.out.println("Rooms allocated successfully!");
+        // } catch (){
 
-       // }
+        // }
     }
 
     private void doUpdateRoomRate() {
-        
+
         try {
-            
+
             System.out.println("\nUpdate Room Rate Details: ");
             doViewAllRoomRateRecords();
             System.out.print("Enter ID Of Room Rate to Update> ");
             int roomRateId = sc.nextInt();
             sc.nextLine();
-            
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             dateFormat.setLenient(false);
-            
+
             RoomRateEntity roomRate = roomRateEntitySessionBeanRemote.retrieveRoomRate(roomRateId);
             System.out.println("1. Room rate Name: " + roomRate.getName());
             System.out.println("2. Rate per night: $" + roomRate.getRatePerNight());
             System.out.println("3. Rate Type: " + roomRate.getRateType() + " (cannot change)");
-            System.out.println("4. Room Type: " + roomRate.getRoomType().getName()+ " (cannot change)");
+            System.out.println("4. Room Type: " + roomRate.getRoomType().getName() + " (cannot change)");
             if (roomRate.getStartDate() != null && roomRate.getEndDate() != null) {
                 System.out.println("5. Start Date: " + roomRate.getStartDate());
                 System.out.println("6. End Date: " + roomRate.getEndDate());
             }
-            
+
             while (true) {
                 System.out.print("Select choice of update> ");
                 int command = sc.nextInt();
@@ -695,7 +721,7 @@ public class HotelOperationModule {
                     }
                 }
             }
-            
+
             RoomRateEntity newRoomRate = roomRateEntitySessionBeanRemote.updateRoomRate(roomRate);
             System.out.println("\nRoom Rate Updated With Details: ");
             System.out.println("1. Room rate Name: " + newRoomRate.getName());
@@ -706,7 +732,7 @@ public class HotelOperationModule {
                 System.out.println("5. Start Date: " + newRoomRate.getStartDate());
                 System.out.println("6. End Date: " + newRoomRate.getEndDate());
             }
-            
+
             System.out.println("Press enter to continue.");
             try {
                 System.in.read();
@@ -726,7 +752,7 @@ public class HotelOperationModule {
         calendar.set(Calendar.MILLISECOND, 0);
         Date currentDate = calendar.getTime();
         SimpleDateFormat df = new SimpleDateFormat("MMM dd yyyy");*/
-   
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
         System.out.println("\nViewing Allocation Exception Report: ");
@@ -738,7 +764,7 @@ public class HotelOperationModule {
         } catch (ParseException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         List<AllocationExceptionEntity> allocationExceptions = allocationExceptionEntitySessionBeanRemote.getExceptionReportsForDate(currentDate);
         System.out.println("Number of exceptions for " + dateFormat.format(currentDate) + ": " + allocationExceptions.size());
         for (AllocationExceptionEntity ae : allocationExceptions) {

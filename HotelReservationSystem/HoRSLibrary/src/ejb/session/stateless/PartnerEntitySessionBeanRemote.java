@@ -7,6 +7,8 @@ package ejb.session.stateless;
 import entities.PartnerEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.AlreadyExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -15,7 +17,7 @@ import javax.ejb.Remote;
 @Remote
 public interface PartnerEntitySessionBeanRemote {
     
-    public long createNewPartner(PartnerEntity newPartner);
+    public long createNewPartner(PartnerEntity newPartner) throws AlreadyExistsException, UnknownPersistenceException;
 
     public List<PartnerEntity> retrieveAllPartners();
 }

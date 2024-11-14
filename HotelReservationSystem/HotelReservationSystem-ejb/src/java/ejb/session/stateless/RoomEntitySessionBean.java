@@ -17,12 +17,15 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import util.enums.RoomStatus;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -41,7 +44,8 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
     private Validator validator;
 
     @Override
-    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException, InputDataValidationException{
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException, InputDataValidationException, UnknownPersistenceException, AlreadyExistsException {
+        try {
         Set<ConstraintViolation<RoomEntity>> constraintViolations = validator.validate(newRoom);
 
         if (constraintViolations.isEmpty()) {
@@ -57,6 +61,15 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
             return newRoom.getId();
         } else {
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new AlreadyExistsException("Room already exists");
+                }
+            }
+            throw new UnknownPersistenceException(ex.getMessage());
+
         }
     }
     

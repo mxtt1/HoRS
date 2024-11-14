@@ -12,10 +12,13 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import util.exception.AlreadyExistsException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -33,14 +36,24 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
     // "Insert Code > Add Business Method")
 
     @Override
-    public long createNewEmployee(EmployeeEntity newEmployee) throws InputDataValidationException{
-        Set<ConstraintViolation<EmployeeEntity>> constraintViolations = validator.validate(newEmployee);
-        if (constraintViolations.isEmpty()) {
-            em.persist(newEmployee);
-            em.flush();
-            return newEmployee.getId();
-        } else {
-            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+    public long createNewEmployee(EmployeeEntity newEmployee) throws InputDataValidationException, AlreadyExistsException, UnknownPersistenceException {
+        try {
+            Set<ConstraintViolation<EmployeeEntity>> constraintViolations = validator.validate(newEmployee);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newEmployee);
+                em.flush();
+                return newEmployee.getId();
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new AlreadyExistsException("Employee already exists");
+                }
+            }
+            throw new UnknownPersistenceException(ex.getMessage());
+
         }
     }
 
@@ -52,12 +65,12 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
     @Override
     public EmployeeEntity retrieveEmployeeByUsername(String username) {
         EmployeeEntity employee = em.createQuery("SELECT e FROM EmployeeEntity e WHERE e.username = :username", EmployeeEntity.class)
-             .setParameter("username", username)
-             .getSingleResult();
+                .setParameter("username", username)
+                .getSingleResult();
         employee.getReservations().size();
         return employee;
     }
-    
+
     @Override
     public EmployeeEntity employeeLogin(String username, String password) throws InvalidLoginCredentialException {
         try {
@@ -71,16 +84,14 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
             throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
         }
     }
-    
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<EmployeeEntity>>constraintViolations)
-    {
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<EmployeeEntity>> constraintViolations) {
         String msg = "Input data validation error!:";
-            
-        for(ConstraintViolation constraintViolation:constraintViolations)
-        {
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
             msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
         }
-        
+
         return msg;
     }
 

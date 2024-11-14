@@ -9,8 +9,10 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import javax.persistence.NoResultException;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -19,9 +21,9 @@ import util.exception.InputDataValidationException;
 @Remote
 public interface RoomRateEntitySessionBeanRemote {
 
-    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType)throws EntityIsDisabledException, InputDataValidationException;
+    public long createNewPublishedNormalRate(RoomRateEntity newRoomRate, String roomType) throws EntityIsDisabledException, InputDataValidationException, AlreadyExistsException, UnknownPersistenceException;
 
-    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType)throws EntityIsDisabledException, InputDataValidationException;
+    public long createNewPeakPromotionRate(RoomRateEntity newRoomRate, Date startDate, Date endDate, String roomType) throws EntityIsDisabledException, InputDataValidationException, AlreadyExistsException, UnknownPersistenceException;
 
     public RoomRateEntity retrieveRoomRateByName(String roomRateName) throws NoResultException;
 

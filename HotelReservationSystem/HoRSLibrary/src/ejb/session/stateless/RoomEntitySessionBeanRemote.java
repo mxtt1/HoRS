@@ -10,8 +10,10 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import javax.persistence.NoResultException;
+import util.exception.AlreadyExistsException;
 import util.exception.EntityIsDisabledException;
 import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -20,7 +22,7 @@ import util.exception.InputDataValidationException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException, InputDataValidationException;
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException, InputDataValidationException, UnknownPersistenceException, AlreadyExistsException;
 
     public List<RoomEntity> retrieveAllRooms();
 
