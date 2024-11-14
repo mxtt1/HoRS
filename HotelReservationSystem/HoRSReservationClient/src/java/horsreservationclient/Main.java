@@ -23,10 +23,12 @@ import horsreservationclient.MainApp;
  */
 public class Main {
 
+
     @EJB(name = "UnregisteredGuestEntitySessionBeanRemote")
     private static UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
 
     @EJB(name = "PartnerEntitySessionBeanRemote")
+
     private static PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
 
     @EJB(name = "ReservationEntitySessionBeanRemote")
@@ -47,9 +49,12 @@ public class Main {
     
     
     
+    
+    
     public static void main(String[] args) throws InvalidLoginCredentialException, InvalidAccessRightException {
         MainApp mainApp = new MainApp(guestEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote,
             roomEntitySessionBean, roomRateEntitySessionBean, reservationEntitySessionBeanRemote, unregisteredGuestEntitySessionBeanRemote);
+
         mainApp.runApp();
     }
     
