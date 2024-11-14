@@ -684,15 +684,29 @@ public class HotelOperationModule {
     }
 
     private void doViewExceptionReport() {
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         Date currentDate = calendar.getTime();
-        SimpleDateFormat df = new SimpleDateFormat("MMM dd yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd yyyy");*/
+   
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        System.out.print("Enter the date of allocation report (dd-MM-yyyy)> ");
+        String inputDate = sc.nextLine().trim();
+        Date currentDate = null;
+        try {
+            currentDate = dateFormat.parse(inputDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("\nViewing Allocation Exception Report: ");
+        System.out.print("Enter date of > ");
+        int roomRateId = sc.nextInt();
         List<AllocationExceptionEntity> allocationExceptions = allocationExceptionEntitySessionBeanRemote.getExceptionReportsForDate(currentDate);
-        System.out.println("Number of exceptions for " + df.format(currentDate) + ": " + allocationExceptions.size());
+        System.out.println("Number of exceptions for " + dateFormat.format(currentDate) + ": " + allocationExceptions.size());
         for (AllocationExceptionEntity ae : allocationExceptions) {
             System.out.println(ae.getMessage());
         }

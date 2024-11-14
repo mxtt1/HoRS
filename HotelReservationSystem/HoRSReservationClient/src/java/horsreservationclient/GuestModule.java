@@ -35,8 +35,6 @@ class GuestModule {
     private GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
-    private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
-    private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
     private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
 
@@ -50,8 +48,6 @@ class GuestModule {
         this.guestEntitySessionBeanRemote = guestEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
-        this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
-        this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
         this.currentGuestEntity = currentGuestEntity;
         this.unregisteredGuestEntitySessionBeanRemote = unregisteredGuestEntitySessionBeanRemote;
@@ -256,11 +252,12 @@ class GuestModule {
     }
 
     private void doViewAllGuestReservations() {
-         System.out.println("\nViewing All Reservations:\n");
+        System.out.println("\nViewing All Reservations:\n");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         List<ReservationEntity> reservations = reservationEntitySessionBeanRemote.retrieveAllReservationsForGuest(this.currentGuestEntity.getId());
 
         for (ReservationEntity re : reservations) {
-            String output = "ID: " + re.getId() + " | Check-in Date: " + re.getStartDate() + " | Check-out Date: " + re.getEndDate()
+            String output = "ID: " + re.getId() + " | Check-in Date: " + dateFormat.format(re.getStartDate()) + " | Check-out Date: " + dateFormat.format(re.getEndDate())
                     + " | Room Type: " + re.getRoomType().getName();
             System.out.println(output);
         }
@@ -275,7 +272,8 @@ class GuestModule {
 
     private void doViewMyReservationDetails() {
         doViewAllGuestReservations();
-        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
         System.out.print("Enter ID of reservation to view details> ");
         long reservationId = sc.nextInt();
         sc.nextLine();
@@ -283,8 +281,8 @@ class GuestModule {
 
         if (reservation.getOccupant().getPassportNum().equals(this.currentGuestEntity.getPassportNum())) {
             System.out.println("Room Type: " + reservation.getRoomType().getName());
-            System.out.println("Check-in Date: " + reservation.getStartDate());
-            System.out.println("Check-out Date: " + reservation.getEndDate());
+            System.out.println("Check-in Date: " + dateFormat.format(reservation.getStartDate()));
+            System.out.println("Check-out Date: " + dateFormat.format(reservation.getEndDate()));
             System.out.println("Total Fee: $" + reservation.getFee());
             System.out.println("Number of Rooms: " + reservation.getQuantity());
             System.out.println("Press enter to continue.");

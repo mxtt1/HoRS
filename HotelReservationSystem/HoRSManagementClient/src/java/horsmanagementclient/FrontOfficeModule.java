@@ -287,14 +287,15 @@ class FrontOfficeModule {
     
     private void doCheckInGuest() {
         UnregisteredGuestEntity guest = null;
-        while (guest == null) {
-            System.out.println("Input guest passport number: ");
-            String passportNum = sc.nextLine().trim();
+        System.out.print("Input guest passport number> ");
+        String passportNum = sc.nextLine().trim();
+        try {
             guest = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNum).get(0);
-            if (guest == null) {
-                System.out.println("No guests associated with inputted passport number.");
-            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println("No guests associated with inputted passport number.");
+            return;
         }
+
         
         List<ReservationEntity> reservations = reservationEntitySessionBeanRemote.retrieveAllReservationsForGuest(guest.getId());
         
@@ -326,14 +327,15 @@ class FrontOfficeModule {
     private void doCheckOutGuest() {
         Date currentDate = new Date();
         UnregisteredGuestEntity guest = null;
-        while (guest == null) {
-            System.out.println("Input guest passport number: ");
-            String passportNum = sc.nextLine().trim();
+        System.out.print("Input guest passport number> ");
+        String passportNum = sc.nextLine().trim();
+        try {
             guest = guestEntitySessionBeanRemote.retrieveGuestByPassportNo(passportNum).get(0);
-            if (guest == null) {
-                System.out.println("No guests associated with inputted passport number.");
-            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println("No guests associated with inputted passport number.");
+            return;
         }
+
         
         List<ReservationEntity> reservations = reservationEntitySessionBeanRemote.retrieveAllReservationsForGuest(guest.getId());
         reservations = reservations.stream().filter(reservation -> !currentDate.after(reservation.getEndDate())).collect(Collectors.toList());

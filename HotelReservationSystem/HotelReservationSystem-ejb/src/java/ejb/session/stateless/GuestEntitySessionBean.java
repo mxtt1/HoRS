@@ -30,13 +30,13 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
         List<UnregisteredGuestEntity> duplicate = em.createQuery("SELECT g FROM UnregisteredGuestEntity g WHERE g.passportNum = :passportNum")
                 .setParameter("passportNum", newGuest.getPassportNum())
                 .getResultList();
-        String passportNum = newGuest.getPassportNum();
-        newGuest.setPassportNum("TEMPORARY");
                 
         if (!duplicate.isEmpty() && !(duplicate.get(0) instanceof GuestEntity)) { // if there exists a UNREGISTERED guest with same passport number
             UnregisteredGuestEntity guestToDelete = duplicate.get(0);
-            List<ReservationEntity> reservations =  guestToDelete.getReservations();
-            
+            List<ReservationEntity> reservations = guestToDelete.getReservations();
+            String passportNum = newGuest.getPassportNum();
+            newGuest.setPassportNum("TEMPORARY");
+
             for (ReservationEntity re : reservations) {
                 re.setOccupant(newGuest);
             }

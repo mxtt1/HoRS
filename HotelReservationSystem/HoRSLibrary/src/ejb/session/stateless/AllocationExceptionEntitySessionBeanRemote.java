@@ -15,6 +15,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface AllocationExceptionEntitySessionBeanRemote {
+    
         public List<AllocationExceptionEntity> getExceptionReportsForDate(Date date);
 
 }

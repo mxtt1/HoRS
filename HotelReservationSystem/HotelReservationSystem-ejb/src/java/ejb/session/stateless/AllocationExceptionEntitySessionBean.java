@@ -23,12 +23,9 @@ public class AllocationExceptionEntitySessionBean implements AllocationException
 
     @Override
     public List<AllocationExceptionEntity> getExceptionReportsForDate(Date date) {
-        return em.createQuery("SELECT ae FROM AllocationExceptionEntity ae WHERE ae.reservationRoom.reservation.startDate = :currentDate", AllocationExceptionEntity.class).setParameter("currentDate", date).getResultList();
-        
-        
-        
-
-        
+        return em.createQuery("SELECT ae FROM AllocationExceptionEntity ae WHERE ae.reservationRoom.reservation.startDate = :currentDate", AllocationExceptionEntity.class)
+                .setParameter("currentDate", date)
+                .getResultList();  
     }
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
