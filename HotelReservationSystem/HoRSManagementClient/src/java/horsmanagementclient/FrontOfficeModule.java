@@ -12,7 +12,6 @@ import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
 import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.EmployeeEntity;
-import entities.GuestEntity;
 import entities.ReservationEntity;
 import entities.ReservationRoomEntity;
 import entities.RoomTypeEntity;
@@ -21,15 +20,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.ejb.EJB;
-import javax.persistence.NoResultException;
 import util.enums.EmployeeRole;
 import util.enums.RoomStatus;
 import util.exception.InputDataValidationException;
@@ -265,11 +261,8 @@ class FrontOfficeModule {
                 }
                 ReservationEntity newReservation = new ReservationEntity(startDate, endDate, bookingQuantity);
                 long newReservationId = 0l;
-                try {
-                    newReservationId = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
-                } catch (InputDataValidationException ex) {
-                    System.out.println(ex.getMessage() + "\n");
-                }
+
+                newReservationId = reservationEntitySessionBeanRemote.createNewWalkInReservation(newReservation, currentEmployeeEntity.getId(), guestId, roomType.getId());
 
                 Date now = new Date();
                 Date reservationStart = newReservation.getStartDate();
@@ -282,8 +275,9 @@ class FrontOfficeModule {
                 }
 
                 System.out.println("Reservation Successful!");
-            } catch (NoResultException e) {
-                System.out.println(e.getMessage());
+
+            } catch (InputDataValidationException ex) {
+                System.out.println(ex.getMessage() + "\n");
             }
         } else {
             return;

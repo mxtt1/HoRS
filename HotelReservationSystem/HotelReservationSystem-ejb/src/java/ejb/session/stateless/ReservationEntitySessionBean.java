@@ -67,7 +67,6 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
             roomTypeToSet.getReservations().add(newReservation);
             newReservation.setRoomType(roomTypeToSet);
 
-            newReservation.setFee(BigDecimal.ZERO);
             em.persist(newReservation);
             em.flush();
 
