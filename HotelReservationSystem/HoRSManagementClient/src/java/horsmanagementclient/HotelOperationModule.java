@@ -79,64 +79,74 @@ public class HotelOperationModule {
         Integer response = 0;
         while (true) {
             System.out.println("\nHoRS System :: Hotel Operation");
-            System.out.println("1. Create New Room Type");
-            System.out.println("2. View Room Type Details");
-            System.out.println("3. Update Room Type");
-            System.out.println("4. Delete Room Type");
-            System.out.println("5. View All Room Types");
-            System.out.println("6. Create New Room");
-            System.out.println("7. Update Room");
-            System.out.println("8. Delete Room");
-            System.out.println("9. View All Rooms");
-            System.out.println("10. Create New Room Rate");
-            System.out.println("11. View Room Rate Details");
-            System.out.println("12. Update Room Rate");
-            System.out.println("13. Delete Room Rate");
-            System.out.println("14. View All Room Rates");
-            System.out.println("15. Manually Allocate Rooms");
-            System.out.println("16. View Room Allocation Exception Report");
+            if (this.currentEmployeeEntity.getEmployeeRole() == EmployeeRole.OPS_MANAGER) {
+                System.out.println("1. Create New Room Type");
+                System.out.println("2. View Room Type Details");
+                System.out.println("3. Update Room Type");
+                System.out.println("4. Delete Room Type");
+                System.out.println("5. View All Room Types");
+                System.out.println("6. Create New Room");
+                System.out.println("7. Update Room");
+                System.out.println("8. Delete Room");
+                System.out.println("9. View All Rooms");
+                System.out.println("15. Manually Allocate Rooms");
+                System.out.println("16. View Room Allocation Exception Report");
+            } else {
+                System.out.println("10. Create New Room Rate");
+                System.out.println("11. View Room Rate Details");
+                System.out.println("12. Update Room Rate");
+                System.out.println("13. Delete Room Rate");
+                System.out.println("14. View All Room Rates");
+            }
             System.out.println("99. Exit");
+
             response = 0;
 
             while (response < 1 || response > 99) {
                 System.out.print("> ");
                 response = sc.nextInt();
                 sc.nextLine();
-                
-                if (response == 1) {
-                    doCreateNewRoomType();
-                } else if (response == 2) {
-                    doViewRoomTypeDetails();
-                } else if (response == 3) {
-                    doUpdateRoomTypeRecord();
-                } else if (response == 4) {
-                    doDeleteRoomTypeRecord();
-                } else if (response == 5) {
-                    doViewAllRoomTypeRecords();
-                } else if (response == 6) {
-                    doCreateNewRoom();
-                } else if (response == 7) {
-                    doUpdateRoom();
-                } else if (response == 8) {
-                    doDeleteRoom();
-                } else if (response == 9) {
-                    doViewAllRooms();
-                } else if (response == 10) {
-                    doCreateNewRoomRate();
-                } else if (response == 11) {
-                    doViewRoomRateDetails();
-                } else if (response == 12) {
-                    doUpdateRoomRate();
-                } else if (response == 13) {
-                    doDeleteRoomRateRecord();
-                } else if (response == 14) {
-                    doViewAllRoomRateRecords();
-                } else if (response == 15) {
-                    doManuallyAllocateRooms();
-                } else if (response == 16) {
-                    doViewExceptionReport();
-                }
-                else if (response == 99) {
+                if (this.currentEmployeeEntity.getEmployeeRole() == EmployeeRole.OPS_MANAGER) {
+                    if (response == 1) {
+                        doCreateNewRoomType();
+                    } else if (response == 2) {
+                        doViewRoomTypeDetails();
+                    } else if (response == 3) {
+                        doUpdateRoomTypeRecord();
+                    } else if (response == 4) {
+                        doDeleteRoomTypeRecord();
+                    } else if (response == 5) {
+                        doViewAllRoomTypeRecords();
+                    } else if (response == 6) {
+                        doCreateNewRoom();
+                    } else if (response == 7) {
+                        doUpdateRoom();
+                    } else if (response == 8) {
+                        doDeleteRoom();
+                    } else if (response == 9) {
+                        doViewAllRooms();
+                    } else if (response == 15) {
+                        doManuallyAllocateRooms();
+                    } else if (response == 16) {
+                        doViewExceptionReport();
+                    } else {
+                        System.out.println("Invalid input, try again!");
+                    }
+                } else if (this.currentEmployeeEntity.getEmployeeRole() == EmployeeRole.SALES_MANAGER) {
+                    if (response == 10) {
+                        doCreateNewRoomRate();
+                    } else if (response == 11) {
+                        doViewRoomRateDetails();
+                    } else if (response == 12) {
+                        doUpdateRoomRate();
+                    } else if (response == 13) {
+                        doDeleteRoomRateRecord();
+                    } else if (response == 14) {
+                        doViewAllRoomRateRecords();
+                    } else {
+                        System.out.println("Invalid input, try again!");
+                    }
+                } else if (response == 99) {
                     break;
                 } else {
                     System.out.println("Invalid input, try again!");
@@ -694,6 +704,7 @@ public class HotelOperationModule {
    
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
+        System.out.println("\nViewing Allocation Exception Report: ");
         System.out.print("Enter the date of allocation report (dd-MM-yyyy)> ");
         String inputDate = sc.nextLine().trim();
         Date currentDate = null;
@@ -702,13 +713,17 @@ public class HotelOperationModule {
         } catch (ParseException ex) {
             Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("\nViewing Allocation Exception Report: ");
-        System.out.print("Enter date of > ");
-        int roomRateId = sc.nextInt();
+        
         List<AllocationExceptionEntity> allocationExceptions = allocationExceptionEntitySessionBeanRemote.getExceptionReportsForDate(currentDate);
         System.out.println("Number of exceptions for " + dateFormat.format(currentDate) + ": " + allocationExceptions.size());
         for (AllocationExceptionEntity ae : allocationExceptions) {
             System.out.println(ae.getMessage());
+        }
+        System.out.println("Press enter to continue.");
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(HotelOperationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
