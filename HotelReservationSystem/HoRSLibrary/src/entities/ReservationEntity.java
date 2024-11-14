@@ -94,6 +94,7 @@ public class ReservationEntity implements Serializable {
         this.startDate = startDate;
         this.endDate = endDate;
         this.quantity = quantity;
+        this.fee = BigDecimal.ZERO;
     }
     
     
