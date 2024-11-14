@@ -6,9 +6,11 @@ package ejb.session.stateless;
 
 import entities.RoomEntity;
 import entities.RoomTypeEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import javax.persistence.NoResultException;
+import util.exception.EntityIsDisabledException;
 
 /**
  *
@@ -16,6 +18,8 @@ import javax.persistence.NoResultException;
  */
 @Local
 public interface RoomEntitySessionBeanLocal {
+    
+    public long createNewRoom(RoomEntity newRoom, String roomTypeName) throws NoResultException, EntityIsDisabledException;
     
     public List<RoomEntity> retrieveAllRooms();
 
@@ -27,6 +31,8 @@ public interface RoomEntitySessionBeanLocal {
 
     public RoomEntity changeRoomType(long roomId, String newRoomTypeName);
 
-    List<RoomEntity> retrieveActiveRoomsForType(RoomTypeEntity roomType);
+    public List<RoomEntity> retrieveActiveRoomsForType(RoomTypeEntity roomType);
+
+    public List<RoomEntity> findUnassignedRoomsForRoomType(long roomTypeId, Date givenDate);
 
 }

@@ -10,6 +10,7 @@ import ejb.session.stateless.ReservationEntitySessionBeanRemote;
 import ejb.session.stateless.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.RoomRateEntitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateless.UnregisteredGuestEntitySessionBeanRemote;
 import entities.GuestEntity;
 import entities.RoomTypeEntity;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UserAlreadyRegisteredException;
 
 /**
  *
@@ -36,20 +38,25 @@ public class MainApp {
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
     private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
+    private UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote;
 
     private GuestEntity currentGuestEntity;
     
     private GuestModule guestModule;
-    private final Scanner sc = new Scanner(System.in);
+    
+    private static Scanner sc = new Scanner(System.in);
+    
 
     public MainApp(GuestEntitySessionBeanRemote guestEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBean, RoomRateEntitySessionBeanRemote roomRateEntitySessionBean, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBean, RoomRateEntitySessionBeanRemote roomRateEntitySessionBean, 
+            ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote, UnregisteredGuestEntitySessionBeanRemote unregisteredGuestEntitySessionBeanRemote) {
         this.guestEntitySessionBeanRemote = guestEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
+        this.unregisteredGuestEntitySessionBeanRemote = unregisteredGuestEntitySessionBeanRemote;
     }
 
     public void runApp() throws InvalidAccessRightException {
@@ -67,11 +74,12 @@ public class MainApp {
             while (response < 1 || response > 99) {
                 System.out.print("> ");
                 response = sc.nextInt();
+                sc.nextLine();
                 if (response == 1) {
                     try {
                         doLogin();
                         System.out.println("Login Successful");
-                        guestModule = new GuestModule(guestEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentGuestEntity, reservationEntitySessionBeanRemote);
+                        guestModule = new GuestModule(guestEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentGuestEntity, reservationEntitySessionBeanRemote, unregisteredGuestEntitySessionBeanRemote);
                         guestModule.menuSystemGuest();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println(ex.getMessage() + "\n");
@@ -93,6 +101,7 @@ public class MainApp {
     }
     
     private void doLogin() throws InvalidLoginCredentialException {
+
         String username = "";
         String password = "";
         
@@ -113,6 +122,7 @@ public class MainApp {
     }
 
     private void doRegisterAsGuest() throws InvalidAccessRightException {
+
         String username = "";
         String password = "";
         String email = "";
@@ -124,15 +134,39 @@ public class MainApp {
         username = sc.nextLine().trim();
         System.out.print("Enter password> ");
         password = sc.nextLine().trim();
+        /*
+        System.out.println("Choose one to input: ");
+        System.out.println("1. Passport number");
+        System.out.println("2. Email");
+        System.out.println("3. Mobile phone number");
+        int input = sc.nextInt();
+        if (input == 1) {
+            System.out.print("Enter passport number> ");
+            passportNum = sc.nextLine().trim();
+        } else if (input == 2) {
+            System.out.print("Enter email> ");
+            email = sc.nextLine().trim();
+        } else if (input == 3) {
+            System.out.print("Enter phone number> ");
+            phoneNum = sc.nextLine().trim();
+        } else {
+            System.out.println("Invalid input!");
+        }
+        */
         System.out.print("Enter passport number> ");
         passportNum = sc.nextLine().trim();
         
         GuestEntity newGuest = new GuestEntity(username, passportNum, password);
-        long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
-        System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
+        try {
+            long newGuestId = guestEntitySessionBeanRemote.createNewGuest(newGuest);
+            System.out.println("New guest account resgistered with username: " + username + " and id: " + newGuestId);
+        } catch (UserAlreadyRegisteredException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     private void doSearchHotelRoom() {
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
         
@@ -164,21 +198,24 @@ public class MainApp {
         
         List<RoomTypeEntity> availableRoomTypes = roomTypeEntitySessionBeanRemote.getAvailableRoomTypes(startDate, endDate);
         if (availableRoomTypes.isEmpty()) {
-            System.out.println("No rooms available for the selected date range.");
+            System.out.println("\nNo rooms available for the selected date range.");
         } else {
-            System.out.println("Available Room Types:");
+            System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("ID: " + roomType.getId());
-                System.out.print(" Name: " + roomType.getName());
-                System.out.print(roomType.getName());
+                System.out.print("\nName: " + roomType.getName());
+                System.out.println(" | Room Description: " + roomType.getDescription());
+                System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
+                System.out.println("Bed: " + roomType.getBedType());
+                System.out.println("Capacity: " + roomType.getCapacity());
+                System.out.println("Amenities: " + roomType.getAmenities());
                 BigDecimal cost = roomTypeEntitySessionBeanRemote.getNormalRateForDates(roomType, startDate, endDate);
-                System.out.print(" Price: $" + cost);
+                System.out.print("Price: $" + cost);
                 int quantity = roomTypeEntitySessionBeanRemote.getAvailableRoomQuantity(startDate, endDate, roomType);
-                System.out.println(" Available Quantity: " + quantity);
+                System.out.println(" | Available Quantity: " + quantity);
             }
         }
         
-        System.out.print("\nPress any key to continue.");
+        System.out.print("\nPress enter to continue.");
         try {
             System.in.read();
         } catch (IOException ex) {

@@ -5,6 +5,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,7 +28,7 @@ public class GuestEntity extends UnregisteredGuestEntity implements Serializable
     private String password;
     
     @OneToMany(mappedBy = "booker")
-    private List<ReservationEntity> bookedReservations;
+    private List<ReservationEntity> bookedReservations = new ArrayList<>();
 
     public GuestEntity() {
     }

@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entities.ReservationEntity;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -15,5 +16,13 @@ import javax.ejb.Remote;
 public interface ReservationEntitySessionBeanRemote {
 
     long createNewOnlineReservation(ReservationEntity newReservation, long bookerId, long roomTypeId);
-    
+
+    public long createNewWalkInReservation(ReservationEntity newReservation, long employeeId, long guestId, long roomTypeId);
+
+    void allocateRoomsToReservation(long reservationId);
+
+    List<ReservationEntity> retrieveAllReservationsForGuest(long guestId);
+
+    ReservationEntity retrieveReservation(long reservationId);
+
 }

@@ -6,6 +6,7 @@ package entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -30,9 +32,9 @@ import util.enums.RateType;
 @Entity
 @NamedQueries ({
     @NamedQuery(name = "findApplicablePromoRates", query = "SELECT rr FROM RoomRateEntity rr "
-            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = 'PROMOTION' AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate"),
+            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = :promotionRate AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate"),
     @NamedQuery(name = "findApplicablePeakRates", query = "SELECT rr FROM RoomRateEntity rr "
-            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = 'PEAK' AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate")
+            + "WHERE rr.disabled = false AND rr.roomType = :roomType AND rr.rateType = :peakRate AND rr.startDate <= :givenDate AND rr.endDate >= :givenDate")
 })
 public class RoomRateEntity implements Serializable {
 
@@ -40,7 +42,7 @@ public class RoomRateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = false, length = 32)
     private String name;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -59,8 +61,8 @@ public class RoomRateEntity implements Serializable {
     @JoinColumn(nullable = false)
     private RoomTypeEntity roomType;
     
-    @ManyToMany()
-    private List<ReservationEntity> reservations;
+    @ManyToMany(mappedBy = "roomRates")
+    private List<ReservationEntity> reservations = new ArrayList<>();
 
     public RoomRateEntity() {
         this.disabled = false;

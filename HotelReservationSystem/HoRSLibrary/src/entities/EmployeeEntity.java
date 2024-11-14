@@ -35,11 +35,11 @@ public class EmployeeEntity implements Serializable {
     private String username;
     @Column(nullable = false, length = 32)
     private String password;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 64)
     private String fullName;
     
     @OneToMany(mappedBy = "employee")
-    private List<ReservationEntity> reservations;
+    private List<ReservationEntity> reservations = new ArrayList<>();
 
     public EmployeeEntity() {
     }
