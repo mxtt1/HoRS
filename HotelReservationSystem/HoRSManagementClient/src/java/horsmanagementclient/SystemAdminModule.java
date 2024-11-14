@@ -140,7 +140,8 @@ public class SystemAdminModule {
         }
         if (username.length() > 0 && password.length() > 0 && fullname.length() > 0) {
             EmployeeEntity newEmployee = new EmployeeEntity(employeeRole, username, password, fullname);
-            employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
+            long id = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
+            System.out.println("New employee with id " + id + " and role " + employeeRole.toString() + " created successfully");
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
@@ -151,8 +152,8 @@ public class SystemAdminModule {
         System.out.println("\nViewing All Employee Records:\n");
         List<EmployeeEntity> employees = employeeEntitySessionBeanRemote.retrieveAllEmployees();
         for (EmployeeEntity e : employees) {
-            System.out.println("ID: " + e.getId() + " Full Name: " + e.getFullName()
-                    + " Username: " + e.getUsername() + " Password: " + e.getPassword());
+            System.out.println("ID: " + e.getId() + "| Full Name: " + e.getFullName()
+                    + "| Username: " + e.getUsername() + "| Password: " + e.getPassword());
         }
         System.out.print("\nPress enter to continue.");
         try {
@@ -173,7 +174,8 @@ public class SystemAdminModule {
 
         if (username.length() > 0 && password.length() > 0) {
             PartnerEntity newPartner = new PartnerEntity(username, password);
-            partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+            long id = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+            System.out.println("New partner with id " + id + " created successfully");
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
@@ -184,7 +186,7 @@ public class SystemAdminModule {
         System.out.println("\nViewing All Partner Records:\n");
         List<PartnerEntity> partners = partnerEntitySessionBeanRemote.retrieveAllPartners();
         for (PartnerEntity p : partners) {
-            System.out.println("ID: " + p.getPartnerEntityId() + " Username: " + p.getUsername());
+            System.out.println("ID: " + p.getPartnerEntityId() + "| Username: " + p.getUsername() + "| Password: " + p.getPassword());
         }
         System.out.print("\nPress enter to continue.");
         try {
