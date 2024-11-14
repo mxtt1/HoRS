@@ -202,9 +202,9 @@ public class HotelOperationModule {
     }
 
     private RoomTypeEntity doViewRoomTypeDetails() {
-
         System.out.println("View Room Type Details: ");
-        System.out.print("Enter Name Of Room Type> ");
+        doViewAllRoomTypeRecords();
+        System.out.print("Enter Name Of Room Type To Views> ");
         String roomTypeName = sc.nextLine().trim();
 
         RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.retrieveRoomTypeByName(roomTypeName);
@@ -227,6 +227,7 @@ public class HotelOperationModule {
     private void doUpdateRoomTypeRecord() {
 
         System.out.println("\nUpdate Room Type Details: ");
+        doViewAllRoomTypeRecords();
         System.out.print("Enter Name Of Room Type to Update> ");
         String roomTypeName = sc.nextLine().trim();
 
@@ -281,7 +282,7 @@ public class HotelOperationModule {
     }
 
     private void doDeleteRoomTypeRecord() {
-
+        
         RoomTypeEntity roomTypeToBeDeleted = this.doViewRoomTypeDetails();
         System.out.print("Enter 'y' to confirm deletion> ");
         String response = sc.nextLine().trim().toLowerCase();
@@ -319,6 +320,7 @@ public class HotelOperationModule {
         System.out.println("\nCreate New Room: ");
         System.out.print("Enter room number> ");
         String roomNumber = sc.nextLine().trim();
+        doViewAllRoomTypeRecords();
         System.out.print("Enter room type name> ");
         String roomTypeName = sc.nextLine().trim();
 
@@ -335,6 +337,7 @@ public class HotelOperationModule {
     private void doUpdateRoom() {
 
         System.out.println("\nUpdate Room: ");
+        doViewAllRooms();
         System.out.print("Enter Number Of Room to Update> ");
         String roomName = sc.nextLine().trim();
 
@@ -386,6 +389,7 @@ public class HotelOperationModule {
     private void doDeleteRoom() {
 
         System.out.println("Delete Room: ");
+        doViewAllRooms();
         System.out.print("Enter Number Of Room to Delete (eg. 1234) > ");
         String roomNum = sc.nextLine().trim();
         RoomEntity roomToBeDeleted = roomEntitySessionBeanRemote.retrieveRoomByNumber(roomNum);
@@ -424,6 +428,7 @@ public class HotelOperationModule {
     private void doCreateNewRoomRate() {
 
         System.out.println("\nCreate New Room Rate: ");
+        doViewAllRoomRateRecords();
         System.out.print("Enter name of room type to create new rate for> ");
         String roomType = sc.nextLine().trim();
 
@@ -508,6 +513,7 @@ public class HotelOperationModule {
     private RoomRateEntity doViewRoomRateDetails() {
 
         System.out.println("\nView Room Rate Details: ");
+        doViewAllRoomRateRecords();
         System.out.print("Enter Name Of Room Rate> ");
         String roomRateName = sc.nextLine().trim();
 

@@ -125,7 +125,7 @@ class GuestModule {
         } else {
             System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("\nName: " + roomType.getName());
+                System.out.println("\nName: " + roomType.getName());
                 System.out.println(" | Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
@@ -157,7 +157,7 @@ class GuestModule {
         } else {
             System.out.println("\nAvailable Room Types:");
             for (RoomTypeEntity roomType : availableRoomTypes) {
-                System.out.print("\nName: " + roomType.getName());
+                System.out.println("\nName: " + roomType.getName());
                 System.out.println(" | Room Description: " + roomType.getDescription());
                 System.out.println("Room Size: " + roomType.getRoomSize() + " square meters");
                 System.out.println("Bed: " + roomType.getBedType());
