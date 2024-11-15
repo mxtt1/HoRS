@@ -318,7 +318,7 @@ class FrontOfficeModule {
             List<ReservationRoomEntity> reservationRooms = reservation.getReservationRooms();
             for (ReservationRoomEntity reservationRoom : reservationRooms) {
                 if (reservationRoom.getAllocatedRoom() == null) {
-                    //
+                    System.out.println(reservationRoom.getAllocationException().getMessage());
                 } else {
                     try {
                         reservationRoom.getAllocatedRoom().setRoomStatus(RoomStatus.OCCUPIED);

@@ -155,10 +155,11 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
                 "SELECT r FROM RoomEntity r "
                 + "WHERE r.disabled = false "
                 + "AND r.roomType.id = :roomTypeId "
-                + "AND r.mostRecentReservation IS NULL",
+                + "AND r.mostRecentReservation IS NULL "
+                + "AND r.roomStatus = :roomStatus",
                 RoomEntity.class
         );
-        queryNoReservation.setParameter("roomTypeId", roomTypeId);
+        queryNoReservation.setParameter("roomTypeId", roomTypeId).setParameter("roomStatus", RoomStatus.AVAILABLE);
         List<RoomEntity> roomsNoReservation = queryNoReservation.getResultList();
 
 
