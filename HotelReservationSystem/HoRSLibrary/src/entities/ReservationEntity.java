@@ -45,7 +45,6 @@ public class ReservationEntity implements Serializable {
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.DATE)
     @NotNull
-    @FutureOrPresent
     private Date startDate;
     
     @Column(nullable = false)

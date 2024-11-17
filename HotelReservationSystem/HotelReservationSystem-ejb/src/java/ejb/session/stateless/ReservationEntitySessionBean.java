@@ -104,7 +104,7 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
                 // Move to the next day
                 currentDate = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24));
             }
-            newReservation.setFee(totalCost);
+            newReservation.setFee(totalCost.multiply(new BigDecimal(newReservation.getQuantity())));
             em.flush();
             return newReservation.getId();
         } else {
@@ -128,7 +128,8 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
             roomTypeToSet.getReservations().add(newReservation);
             newReservation.setRoomType(roomTypeToSet);
 
-            newReservation.setFee(roomTypeEntitySessionBean.getPublishedRateForDates(roomTypeToSet, newReservation.getStartDate(), newReservation.getEndDate()));
+            BigDecimal totalCost = roomTypeEntitySessionBean.getPublishedRateForDates(roomTypeToSet, newReservation.getStartDate(), newReservation.getEndDate());
+            newReservation.setFee(totalCost.multiply(new BigDecimal(newReservation.getQuantity())));
             em.persist(newReservation);
             em.flush();
 
@@ -215,7 +216,10 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
 
         for (ReservationEntity re : reservations) {
             re.getRoomType().getName();
-            re.getReservationRooms().size();
+            for (ReservationRoomEntity reservationRoom : re.getReservationRooms()) {
+                reservationRoom.getAllocationException();
+                reservationRoom.getAllocatedRoom();
+            }
         }
         return reservations;
     }
